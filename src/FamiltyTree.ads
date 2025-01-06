@@ -15,15 +15,15 @@ package FamilyTree is
 
    -- 1. Créer un arbre minimal contenant le seul nœud racine, sans père ni mère.
    procedure initialize (ABR : out T_FamilyTree; Individu : in T_Person) with
-      Post => getGenerationsCount(ABR) = 0;
+      Post => getGenerationsCount(ABR) = 0; -- SHOULD HAVE ONE SINGLE GENERATION
 
    -- Renvoie le nombre de générations dans un arbre donné
    function getGenerationsCount (ABR : in T_FamilyTree) return Integer;
 
    -- 2. Ajouter un parent (mère ou père) à un noeud donné.
    procedure addParent (ABR : in out T_FamilyTree; Id_Node : in Hash; Parent : in T_Person) with
-      Pre => getAncestorsCount(ABR, Id_Node, 0) < 2;
-      -- Post?
+      Pre => getAncestorsCount(ABR, Id_Node, 0) < 2, -- SHOULD NOT ALREADY HAVE TWO PARENTS
+      Post => getAncestorsCount(ABR, Id_Node, 0)'Result = getAncestorsCount(ABR, Id_Node, 0) + 1; -- THE NUMBER OF PARENTS SHOULD BE +1 AT THE END
 
    -- 3. Obtenir le nombre d’ancêtres connus (lui compris) d’un individu donné
    function getAncestorsCount (ABR : in T_FamilyTree; Id_Node : in Hash) return PersonVector;
@@ -35,7 +35,9 @@ package FamilyTree is
    procedure showNode (ABR : in T_FamilyTree; Id_Node : in Hash);
 
    -- 6. Supprimer, pour un arbre, un nœud et ses ancêtres.
-   procedure deleteNode (ABR: in out T_FamilyTree; Id_Node: in Hash);
+   procedure deleteNode (ABR: in out T_FamilyTree; Id_Node: in Hash) with
+      Pre => isPresent(ABR, Id_Node), -- NODE Id_Node IS PRESENT IN FAMILY TREE
+      Post => TBD
 
    -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals (ABR : in T_FamilyTree; Id_Node : in Hash) return PersonVector;
