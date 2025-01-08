@@ -4,73 +4,70 @@ generic
 
 package BinaryTree is
 
-	type T_BinaryTree is private;
-	type T_Node is private;
+   type T_BinaryTree is private;
+   type T_Node is private;
 
-	Key_Presente_Exception : Exception;	-- une clé est déjà présente dans un ABR
-	Key_Absente_Exception  : Exception;	-- une clé est absente d'un ABR
+   Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
+   Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
 
-	-- Initialiser un ABR Abr.  L'ABR est vide.
-	procedure Initialiser(Abr: out T_BinaryTree) with
-		Post => Est_Vide (Abr);
+   -- Initialiser un ABR ABR.  L'ABR est vide.
+   procedure initializeBinaryTree (ABR : out T_BinaryTree) with
+     Post => isEmpty (ABR);
 
-	-- Est-ce qu'un ABR Abr est vide ?
-	function Est_Vide (Abr : T_BinaryTree) return Boolean;
+   -- Est-ce qu'un ABR ABR est vide ?
+   function isEmpty (ABR : T_BinaryTree) return Boolean;
 
-	-- Obtenir le nombre d'éléments d'un ABR. 
-	function Taille (Abr : in T_BinaryTree) return Integer with
-		Post => Taille'Result >= 0
-			and (Taille'Result = 0) = Est_Vide (Abr);
+   -- Obtenir le nombre d'éléments d'un ABR.
+   function getSize (ABR : in T_BinaryTree) return Integer with
+     Post => getSize'Result >= 0 and (getSize'Result = 0) = isEmpty (ABR);
 
-	-- Insérer la donnée Donnée associée à la clé Clé dans l'ABR Abr.
-	-- Exception : Key_Presente_Exception si la clé est déjà dans l'Abr.
-	procedure Inserer (Abr : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
-		Post => La_Data (Abr, Key) = Data			-- donnée insérée
-			; -- XXX and Taille (Abr) = Taille (Abr)'Old + 1; -- un élément de plus
+   -- Insérer la donnée Donnée associée à la clé Clé dans l'ABR ABR.
+   -- Exception : Key_Presente_Exception si la clé est déjà dans l'ABR.
+   procedure insertNode
+     (ABR : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
+     Post => La_Data (ABR, Key) =
+      Data                       -- donnée insérée
+     ; -- XXX and Taille (ABR) = Taille (ABR)'Old + 1; -- un élément de plus
 
-	-- Modifier la donnée Donnée associée à la clé Clé dans l'ABR Abr.
-	-- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'Abr
-	procedure Modifier (Abr : in out T_BinaryTree ; Key : in T_Key ; Data : in T_Data) with
-		Post => La_Data (Abr, Key) = Data;		-- donnée mise à jour
+   -- Modifier la donnée Donnée associée à la clé Clé dans l'ABR ABR.
+   -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
+   procedure modifyNode
+     (ABR : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
+     Post => getData (ABR, Key) = Data;              -- donnée mise à jour
 
-	-- Supprimer la donnée associée à la clé Clé dans l'ABR Abr.
-	-- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'Abr
-	procedure Supprimer (Abr : in out T_BinaryTree ; Key : in T_Key) with
-		Post =>  Taille (Abr) = Taille (Abr)'Old - 1; -- un élément de moins
+   -- Supprimer la donnée associée à la clé Clé dans l'ABR ABR.
+   -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
+   procedure deleteNode (ABR : in out T_BinaryTree; Key : in T_Key) with
+     Post => getSize (ABR) = Taille (ABR)'Old - 1; -- un élément de moins
 
-	-- Obtenir la donnée associée à la clé Key dans l'ABR Abr.
-	-- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'Abr
-	function La_Data (Abr : in T_BinaryTree ; Key : in T_Key) return Integer;
+   -- 6. Supprimer, pour un arbre, un nœud et ses ancêtres.
+   procedure deleteNodeRecursive
+     (ABR : in out T_BinaryTree; Id_Node : in Integer) with
+     Pre => isPresent (ABR, Id_Node), -- NODE Id_Node IS PRESENT IN FAMILY TREE
+     Post =>
+      isPresent (ABR, Id_Node) =
+      false; --TODO: DEFINE A CORRECT POST CONDITION TO DESCRIBE THE BEHAVIOUR (ALL ANCESTORS BEING DELETED)
 
-	-- Supprimer tous les éléments d'un ABR.
-	-- Doit être utilisée dès qu'on sait qu'un ABR ne sera plus utilisé.
-	procedure Vider (Abr : in out T_BinaryTree) with
-		Post => Est_Vide (Abr);
+   -- Obtenir la donnée associée à la clé Key dans l'ABR ABR.
+   -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
+   function getNode (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
 
-	-- Afficher un ABR Abr dans l'ordre croissant des clés (parcours infixe)
-	procedure Afficher (Abr : in T_BinaryTree);
+   -- Supprimer tous les éléments d'un ABR.
+   -- Doit être utilisée dès qu'on sait qu'un ABR ne sera plus utilisé.
+   procedure clean (ABR : in out T_BinaryTree) with
+     Post => isEmpty (ABR);
 
-	-- Afficher un ABR Abr (en faisant apparaître la strucre grâce à une
-	-- indendation et un signe '<', '>', '/' pour indiquer la sous-arbre
-	-- gauche, '>' pour un sous arbre droit et '/' pour la racine)
-	-- Exemple :
-	--
-	--  / Key1 : Valeur1
-	--      < Key2 : Valeur2
-	--          > Key3 : Valeur3
-	--      > Key4 : Valeur 4
-	--          < Key5 : Valeur 5
-	procedure Afficher_Debug (Abr : in T_BinaryTree);
+   -- Afficher un ABR ABR dans l'ordre croissant des clés (parcours infixe)
+   procedure show (ABR : in T_BinaryTree);
 
 private
 
-	type T_BinaryTree is access T_Node;
-	type T_Node is
-		record
-			Key: T_Key;
-			Data : T_Data;
-			Sous_Arbre_Gauche : T_BinaryTree;
-			Sous_Arbre_Droit : T_BinaryTree;
-		end record;
+   type T_BinaryTree is access T_Node;
+   type T_Node is record
+      Key               : T_Key;
+      Data              : T_Data;
+      Sous_Arbre_Gauche : T_BinaryTree;
+      Sous_Arbre_Droit  : T_BinaryTree;
+   end record;
 
 end BinaryTree;

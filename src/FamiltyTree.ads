@@ -13,7 +13,8 @@ package FamilyTree is
    use P_FamilyTree;
 
    -- 1. Créer un arbre minimal contenant le seul nœud racine, sans père ni mère.
-   procedure initialize (ABR : out T_BinaryTree; Individu : in T_Person) with
+   procedure initializeFamilyTree
+     (ABR : out T_BinaryTree; Individu : in T_Person) with
      Post =>
       getGenerationsCount (ABR) = 0; -- SHOULD HAVE ONE SINGLE GENERATION
 
@@ -42,14 +43,7 @@ package FamilyTree is
       return PersonVector;
 
    -- 5. Afficher l’arbre à partir d’un nœud donné.
-   procedure showNode (ABR : in T_BinaryTree; Id_Node : in Integer);
-
-   -- 6. Supprimer, pour un arbre, un nœud et ses ancêtres.
-   procedure deleteNode (ABR : in out T_BinaryTree; Id_Node : in Integer) with
-     Pre => isPresent (ABR, Id_Node), -- NODE Id_Node IS PRESENT IN FAMILY TREE
-     Post =>
-      isPresent (ABR, Id_Node) =
-      false; --TODO: DEFINE A CORRECT POST CONDITION TO DESCRIBE THE BEHAVIOUR (ALL ANCESTORS BEING DELETED)
+   procedure showFamilyTree (ABR : in T_BinaryTree; Id_Node : in Integer);
 
    -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals
@@ -58,9 +52,5 @@ package FamilyTree is
    -- 8. Obtenir l’ensemble des individus dont les deux parents sont connus.
    function getDualParentIndividuals
      (ABR : in T_BinaryTree; Id_Node : in Integer) return PersonVector;
-
-   -- Get node by ID
-   function getNode
-     (ABR : in T_BinaryTree; Id_Node : in Integer) return T_Node;
 
 end FamilyTree;
