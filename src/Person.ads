@@ -1,3 +1,5 @@
+with Dates; use Dates;
+
 package Person is
    type T_Person is private;
 
@@ -7,7 +9,6 @@ private
 			FirstNamme : String;
 			LastName : String;
 			Gender : String;
-         Birthdate : String;
+         Birthdate : T_Date;
 		end record;
-      
 end;

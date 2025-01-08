@@ -4,7 +4,8 @@ generic
 
 package BinaryTree is
 
-	type T_BinaryTree is limited private;
+	type T_BinaryTree is private;
+	type T_Node is private;
 
 	Key_Presente_Exception : Exception;	-- une clé est déjà présente dans un ABR
 	Key_Absente_Exception  : Exception;	-- une clé est absente d'un ABR
@@ -63,9 +64,8 @@ package BinaryTree is
 
 private
 
-	type T_Noeud;
-	type T_BinaryTree is access T_Noeud;
-	type T_Noeud is
+	type T_BinaryTree is access T_Node;
+	type T_Node is
 		record
 			Key: T_Key;
 			Data : T_Data;

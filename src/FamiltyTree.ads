@@ -1,17 +1,19 @@
-with BinaryTree;
+with BinaryTree; use BinaryTree;
 with Person; use Person;
 with Ada.Containers.Vectors;
 
 package FamilyTree is
 
+   -- CHAINED LIST FOR PERSON
+   package PersonVector is new Ada.Containers.Vectors(Element_Type => Person);
+
+   -- GENERIC USAGE OF BINARY TREE
    package T_FamilyTree is
       new BinaryTree (
          T_Key => Hash,
          T_Data => T_Person
       );
    use T_FamilyTree;
-
-   package PersonVector is new Ada.Containers.Vectors(Element_Type => Person);
 
    -- 1. Créer un arbre minimal contenant le seul nœud racine, sans père ni mère.
    procedure initialize (ABR : out T_FamilyTree; Individu : in T_Person) with
@@ -37,12 +39,15 @@ package FamilyTree is
    -- 6. Supprimer, pour un arbre, un nœud et ses ancêtres.
    procedure deleteNode (ABR: in out T_FamilyTree; Id_Node: in Hash) with
       Pre => isPresent(ABR, Id_Node), -- NODE Id_Node IS PRESENT IN FAMILY TREE
-      Post => TBD
+      Post => isPresent(ABR, Id_Node) = false; --TODO: DEFINE A CORRECT POST CONDITION TO DESCRIBE THE BEHAVIOUR (ALL ANCESTORS BEING DELETED)
 
    -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals (ABR : in T_FamilyTree; Id_Node : in Hash) return PersonVector;
 
    -- 8. Obtenir l’ensemble des individus dont les deux parents sont connus.
    function getDualParentIndividuals (ABR : in T_FamilyTree; Id_Node : in Hash) return PersonVector;
+
+   -- Get node by ID
+   function getNode(ABR : in T_FamilyTree; Id_Node : in Hash) return T_Node;
 
 end;
