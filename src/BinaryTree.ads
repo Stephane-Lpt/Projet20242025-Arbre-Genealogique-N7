@@ -24,23 +24,23 @@ package BinaryTree is
 
 	-- Insérer la donnée Donnée associée à la clé Clé dans l'ABR Abr.
 	-- Exception : Key_Presente_Exception si la clé est déjà dans l'Abr.
-	procedure Inserer (Abr : in out T_BinaryTree; Key : in Character; Data : in Integer) with
+	procedure Inserer (Abr : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
 		Post => La_Data (Abr, Key) = Data			-- donnée insérée
 			; -- XXX and Taille (Abr) = Taille (Abr)'Old + 1; -- un élément de plus
 
 	-- Modifier la donnée Donnée associée à la clé Clé dans l'ABR Abr.
 	-- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'Abr
-	procedure Modifier (Abr : in out T_BinaryTree ; Key : in Character ; Data : in Integer) with
+	procedure Modifier (Abr : in out T_BinaryTree ; Key : in T_Key ; Data : in T_Data) with
 		Post => La_Data (Abr, Key) = Data;		-- donnée mise à jour
 
 	-- Supprimer la donnée associée à la clé Clé dans l'ABR Abr.
 	-- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'Abr
-	procedure Supprimer (Abr : in out T_BinaryTree ; Key : in Character) with
+	procedure Supprimer (Abr : in out T_BinaryTree ; Key : in T_Key) with
 		Post =>  Taille (Abr) = Taille (Abr)'Old - 1; -- un élément de moins
 
 	-- Obtenir la donnée associée à la clé Key dans l'ABR Abr.
 	-- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'Abr
-	function La_Data (Abr : in T_BinaryTree ; Key : in Character) return Integer;
+	function La_Data (Abr : in T_BinaryTree ; Key : in T_Key) return Integer;
 
 	-- Supprimer tous les éléments d'un ABR.
 	-- Doit être utilisée dès qu'on sait qu'un ABR ne sera plus utilisé.
