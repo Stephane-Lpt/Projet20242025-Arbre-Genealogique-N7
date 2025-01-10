@@ -21,17 +21,9 @@ package BinaryTree is
    function getSize (ABR : in T_BinaryTree) return Integer with
      Post => getSize'Result >= 0 and (getSize'Result = 0) = isEmpty (ABR);
 
-   -- Insérer la donnée Donnée associée à la clé Clé dans l'ABR ABR.
-   -- Exception : Key_Presente_Exception si la clé est déjà dans l'ABR.
-   procedure insertNode
-     (ABR : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
-     Post => La_Data (ABR, Key) =
-      Data                       -- donnée insérée
-     ; -- XXX and Taille (ABR) = Taille (ABR)'Old + 1; -- un élément de plus
-
    -- Modifier la donnée Donnée associée à la clé Clé dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
-   procedure modifyNode
+   procedure setData
      (ABR : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
      Post => getData (ABR, Key) = Data;              -- donnée mise à jour
 
@@ -50,7 +42,7 @@ package BinaryTree is
 
    -- Obtenir la donnée associée à la clé Key dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
-   function getNode (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
+   function getData (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
 
    function isPresent (ABR : in T_BinaryTree; Key : in T_Key) return Boolean;
 
@@ -62,15 +54,14 @@ package BinaryTree is
    -- Afficher un ABR ABR dans l'ordre croissant des clés (parcours infixe)
    procedure show (ABR : in T_BinaryTree);
 
-
 private
 
    type T_BinaryTree is access T_Node;
    type T_Node is record
       Key               : T_Key;
       Data              : T_Data;
-      Sous_Arbre_Gauche : T_BinaryTree;
-      Sous_Arbre_Droit  : T_BinaryTree;
+      Left : T_BinaryTree;
+      Right  : T_BinaryTree;
    end record;
 
 end BinaryTree;
