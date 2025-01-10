@@ -38,7 +38,7 @@ package BinaryTree is
    -- Supprimer la donnée associée à la clé Clé dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
    procedure deleteNode (ABR : in out T_BinaryTree; Key : in T_Key) with
-     Post => getSize (ABR) = Taille (ABR)'Old - 1; -- un élément de moins
+     Post => getSize (ABR) = Taille (ABR)'Old - 1 and not isPresent (ABR, Key);
 
    -- 6. Supprimer, pour un arbre, un nœud et ses ancêtres.
    procedure deleteNodeRecursive
@@ -52,6 +52,8 @@ package BinaryTree is
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
    function getNode (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
 
+   function isPresent (ABR : in T_BinaryTree; Key : in T_Key) return Boolean;
+
    -- Supprimer tous les éléments d'un ABR.
    -- Doit être utilisée dès qu'on sait qu'un ABR ne sera plus utilisé.
    procedure clean (ABR : in out T_BinaryTree) with
@@ -59,6 +61,7 @@ package BinaryTree is
 
    -- Afficher un ABR ABR dans l'ordre croissant des clés (parcours infixe)
    procedure show (ABR : in T_BinaryTree);
+
 
 private
 
