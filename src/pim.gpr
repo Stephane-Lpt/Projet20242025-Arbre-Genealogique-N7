@@ -1,9 +1,9 @@
-project Project is
+project pim is
 
     -- ICI ON DOIT METTRE TOUS LES FICHIERS .adb MAIN (pas de .ads et de .adb qui implementent les .ads)
     -- EXEMPLE : for Main use ("exemple_integer_io.adb", "parenthesage.adb", "test_piles.adb", "utiliser_piles.adb");
     -- SANS INCLURE "piles.ads", "piles.adb"...
-    for Main use ("");
+    for Main use ("TestBinaryTree.adb");
 
     package Builder is
         for Default_Switches ("ada") use ("-s");
@@ -17,5 +17,5 @@ project Project is
         for Default_Switches ("ada") use ("-E");
     end Binder;
 
-end Project;
+end pim;
 

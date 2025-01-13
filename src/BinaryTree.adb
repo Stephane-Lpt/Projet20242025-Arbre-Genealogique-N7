@@ -30,7 +30,7 @@ package body BinaryTree is
 	end getSize;
 
    -- TODO
-   function isPresent (ABR: in T_BinaryTree; Key: T_Key) return boolean is
+   function isPresent (ABR: in T_BinaryTree; Key: Integer) return boolean is
    begin
       if isEmpty (ABR) then
          return False;
@@ -41,35 +41,58 @@ package body BinaryTree is
       end if;
    end isPresent;
 
-   function getTree (ABR : in T_BinaryTree; Key : in T_Key) return T_BinaryTree is
+   function getTree (ABR : in T_BinaryTree; Key : in Integer) return T_BinaryTree is
    begin
       return Null;
-   end getNode;
+   end getTree;
 
-	procedure setData (ABR : in out T_BinaryTree ; Key : in T_Key ; Data : in T_Data) is
+	procedure setData (ABR : in out T_BinaryTree ; Key : in Integer ; Data : in T_Data) is
       Tree : T_BinaryTree;
 	begin
       Tree := getTree(ABR, Key);
       Tree.all.Data := Data;
    end setData;
 
-   -- TODO
-   function getData (ABR : in T_BinaryTree ; Key : in T_Key) return T_Data is
+   function getData (ABR : in T_BinaryTree ; Key : in Integer) return T_Data is
 	begin
 		return getTree(ABR, Key).all.Data;
+	end getData;
+
+   procedure addNode (ABR : in out T_BinaryTree; Key : in Integer; Node : in T_Node; Position : in T_Position) is
+      Tree : T_BinaryTree;
+   begin
+      if ABR.all.Key /= Key then
+         Tree := getTree(ABR, Key);
+      else
+         Tree := ABR;
+      end if;
+
+      case Position is
+         when RIGHT =>
+            Tree.all.Right.all := Node;
+         when LEFT =>
+            Tree.all.Left.all := Node;
+      end case;
+   end addNode;
+
+   -- TODO
+   procedure deleteNode (ABR : in out T_BinaryTree ; Key : in Integer) is
+      Tree : T_BinaryTree;
+   begin
+      if ABR.all.Key /= Key then
+         Tree := getTree(ABR, Key);
+      else
+         Tree := ABR;
+      end if;
+
+		Free(Tree);
 	end deleteNode;
 
    -- TODO
-   procedure deleteNode (ABR : in out T_BinaryTree ; Key : in T_Key) is
+   procedure deleteNodeRecursive (ABR : in out T_BinaryTree ; Key : in Integer) is
 	begin
 		Null;	-- TODO : à changer
-	end deleteNode;
-
-   -- TODO
-   procedure deleteNodeRecursive (ABR : in out T_BinaryTree ; Key : in T_Key) is
-	begin
-		Null;	-- TODO : à changer
-	end deleteNode;
+	end deleteNodeRecursive;
 
    -- TODO
    procedure clean (ABR : in out T_BinaryTree) is
@@ -82,8 +105,8 @@ package body BinaryTree is
    begin
       if not isEmpty (ABR) then
          Put(ABR.all.Key);
-         show(ABR.all.Left);
          show(ABR.all.Right);
+         show(ABR.all.Left);
       end if;
    end show;
 

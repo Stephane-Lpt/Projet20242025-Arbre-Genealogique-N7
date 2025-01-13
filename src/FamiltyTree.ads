@@ -5,7 +5,8 @@ with Ada.Containers.Vectors;
 package FamilyTree is
 
    -- CHAINED LIST FOR PERSON
-   package PersonVector is new Ada.Containers.Vectors (Element_Type => Person);
+   package PersonVector is new Ada.Containers.Vectors (Element_Type => T_Person);
+   package NodeVector is new Ada.Containers.Vectors (Element_Type => T_Node);
 
    -- GENERIC USAGE OF BINARY TREE
    package P_FamilyTree is new BinaryTree
@@ -40,7 +41,7 @@ package FamilyTree is
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
    function getAncestorsByGeneration
      (ABR : in T_BinaryTree; Id_Node : in Integer; Generation : in Integer)
-      return T_BinaryTree;
+      return NodeVector;
 
    -- 5. Afficher l’arbre à partir d’un nœud donné.
    procedure showFamilyTree (ABR : in T_BinaryTree; Id_Node : in Integer);

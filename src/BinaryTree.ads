@@ -1,11 +1,16 @@
 generic
    type T_Data is private;
-   type T_Key is private;
 
 package BinaryTree is
 
    type T_BinaryTree is private;
-   type T_Node is private;
+   type T_Node is record
+      Key               : Integer;
+      Data              : T_Data;
+      Left : T_BinaryTree;
+      Right  : T_BinaryTree;
+   end record;
+   
    type T_Position is (LEFT, RIGHT);
 
    Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
@@ -25,33 +30,35 @@ package BinaryTree is
    -- Modifier la donnée Donnée associée à la clé Clé dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
    procedure setData
-     (ABR : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
+     (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Data) with
      Post => getData (ABR, Key) = Data;              -- donnée mise à jour
-
-   procedure addNode (ABR : in out T_BinaryTree; Key : in T_Key; Node : in T_Node; Position : in T_Position) with
-      Pre => isPresent (ABR, Key),
-      Post => (Position = LEFT and getNode(ABR, Key).Left = Node) or (Position = RIGHT and getNode(ABR, Key).Right = Node); 
-
+           
    -- Obtenir la donnée associée à la clé Key dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
-   function getData (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
+   function getData (ABR : in T_BinaryTree; Key : in Integer) return T_Data;
 
-   function getNode (ABR: in T_BinaryTree; Key : in T_Key) return T_Node;
+   procedure addNode (ABR : in out T_BinaryTree; Key : in Integer; Node : in T_Node; Position : in T_Position) with
+     Pre => isPresent(ABR, Key);
+     --Post =>
+     --  (Position = LEFT and getTree(ABR, Key).all.Left = Node) or
+     --  (Position = RIGHT and getTree(ABR, Key).all.Right = Node);
+
+   function getTree (ABR: in T_BinaryTree; Key : in Integer) return T_BinaryTree;
 
    -- Supprimer la donnée associée à la clé Clé dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
-   procedure deleteNode (ABR : in out T_BinaryTree; Key : in T_Key) with
-     Post => getSize (ABR) = Taille (ABR)'Old - 1 and not isPresent (ABR, Key);
+   procedure deleteNode (ABR : in out T_BinaryTree; Key : in Integer) with
+     Post => getSize (ABR) = getSize (ABR)'Old - 1 and not isPresent (ABR, Key);
 
    -- 6. Supprimer, pour un arbre, un nœud et ses ancêtres.
    procedure deleteNodeRecursive
-     (ABR : in out T_BinaryTree; Id_Node : in Integer) with
-     Pre => isPresent (ABR, Id_Node), -- NODE Id_Node IS PRESENT IN FAMILY TREE
+     (ABR : in out T_BinaryTree; Key : in Integer) with
+     Pre => isPresent (ABR, Key), -- NODE Id_Node IS PRESENT IN FAMILY TREE
      Post =>
-      isPresent (ABR, Id_Node) =
+      isPresent (ABR, Key) =
       false; --TODO: DEFINE A CORRECT POST CONDITION TO DESCRIBE THE BEHAVIOUR (ALL ANCESTORS BEING DELETED)
 
-   function isPresent (ABR : in T_BinaryTree; Key : in T_Key) return Boolean;
+   function isPresent (ABR : in T_BinaryTree; Key : in Integer) return Boolean;
 
    -- Supprimer tous les éléments d'un ABR.
    -- Doit être utilisée dès qu'on sait qu'un ABR ne sera plus utilisé.
@@ -64,11 +71,5 @@ package BinaryTree is
 private
 
    type T_BinaryTree is access T_Node;
-   type T_Node is record
-      Key               : T_Key;
-      Data              : T_Data;
-      Left : T_BinaryTree;
-      Right  : T_BinaryTree;
-   end record;
 
 end BinaryTree;
