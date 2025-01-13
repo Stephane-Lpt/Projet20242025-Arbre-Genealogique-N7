@@ -9,3 +9,13 @@ nikita*
 
 # consignes, corrigés
 *.pdf
+
+*.o
+*.exe
+*.ali
+*.bexch
+*.stderr
+*.stdout
+*.xml
+*.cgpr
+*.cswi
