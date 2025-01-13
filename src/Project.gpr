@@ -1,0 +1,21 @@
+project Project is
+
+    -- ICI ON DOIT METTRE TOUS LES FICHIERS .adb MAIN (pas de .ads et de .adb qui implementent les .ads)
+    -- EXEMPLE : for Main use ("exemple_integer_io.adb", "parenthesage.adb", "test_piles.adb", "utiliser_piles.adb");
+    -- SANS INCLURE "piles.ads", "piles.adb"...
+    for Main use ("");
+
+    package Builder is
+        for Default_Switches ("ada") use ("-s");
+    end Builder;
+
+    package Compiler is
+        for Default_Switches ("ada") use ("-gnatwa", "-gnata", "-g");
+    end Compiler;
+
+    package Binder is
+        for Default_Switches ("ada") use ("-E");
+    end Binder;
+
+end Project;
+

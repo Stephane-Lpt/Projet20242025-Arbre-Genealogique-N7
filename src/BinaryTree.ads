@@ -27,6 +27,15 @@ package BinaryTree is
      (ABR : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
      Post => getData (ABR, Key) = Data;              -- donnée mise à jour
 
+   -- Ajouter un noeud à un ABR
+   procedure addNode
+
+   -- Obtenir la donnée associée à la clé Key dans l'ABR ABR.
+   -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
+   function getData (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
+
+   function getNode (ABR: in T_BinaryTree; Key : in T_Key) return T_Node;
+
    -- Supprimer la donnée associée à la clé Clé dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
    procedure deleteNode (ABR : in out T_BinaryTree; Key : in T_Key) with
@@ -39,10 +48,6 @@ package BinaryTree is
      Post =>
       isPresent (ABR, Id_Node) =
       false; --TODO: DEFINE A CORRECT POST CONDITION TO DESCRIBE THE BEHAVIOUR (ALL ANCESTORS BEING DELETED)
-
-   -- Obtenir la donnée associée à la clé Key dans l'ABR ABR.
-   -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
-   function getData (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
 
    function isPresent (ABR : in T_BinaryTree; Key : in T_Key) return Boolean;
 
