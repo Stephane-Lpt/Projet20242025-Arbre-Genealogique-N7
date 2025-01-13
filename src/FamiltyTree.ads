@@ -40,7 +40,7 @@ package FamilyTree is
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
    function getAncestorsByGeneration
      (ABR : in T_BinaryTree; Id_Node : in Integer; Generation : in Integer)
-      return PersonVector;
+      return T_BinaryTree;
 
    -- 5. Afficher l’arbre à partir d’un nœud donné.
    procedure showFamilyTree (ABR : in T_BinaryTree; Id_Node : in Integer);

@@ -6,6 +6,7 @@ package BinaryTree is
 
    type T_BinaryTree is private;
    type T_Node is private;
+   type T_Position is (LEFT, RIGHT);
 
    Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
    Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
@@ -27,9 +28,7 @@ package BinaryTree is
      (ABR : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
      Post => getData (ABR, Key) = Data;              -- donnée mise à jour
 
-   -- Ajouter un noeud à un ABR
-   procedure addNode
-
+   procedure addNode (ABR : in out T_BinaryTree; Key : in T_Key; Node : in T_Node; Position : in T_Position) with 
    -- Obtenir la donnée associée à la clé Key dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
    function getData (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
