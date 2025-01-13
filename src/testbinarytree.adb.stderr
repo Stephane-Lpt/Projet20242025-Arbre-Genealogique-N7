@@ -1,2 +1,0 @@
-testbinarytree.adb:10:04: warning: variable "RootNode" is never read and never assigned [-gnatwv]
-testbinarytree.adb:16:25: warning: "Tree" modified by call, but value might not be referenced [-gnatwm]
