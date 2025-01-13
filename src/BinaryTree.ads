@@ -28,7 +28,10 @@ package BinaryTree is
      (ABR : in out T_BinaryTree; Key : in T_Key; Data : in T_Data) with
      Post => getData (ABR, Key) = Data;              -- donnée mise à jour
 
-   procedure addNode (ABR : in out T_BinaryTree; Key : in T_Key; Node : in T_Node; Position : in T_Position) with 
+   procedure addNode (ABR : in out T_BinaryTree; Key : in T_Key; Node : in T_Node; Position : in T_Position) with
+      Pre => isPresent (ABR, Key),
+      Post => (Position = LEFT and getNode(ABR, Key).Left = Node) or (Position = RIGHT and getNode(ABR, Key).Right = Node); 
+
    -- Obtenir la donnée associée à la clé Key dans l'ABR ABR.
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
    function getData (ABR : in T_BinaryTree; Key : in T_Key) return T_Data;
