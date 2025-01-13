@@ -11,7 +11,12 @@ package body BinaryTree is
 	procedure initializeBinaryTree(ABR: out T_BinaryTree) is
 	begin
 		ABR := Null;
-	end initializeBinaryTree;
+   end initializeBinaryTree;
+
+   procedure setRootNode (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Data; Left : in T_BinaryTree; Right : in T_BinaryTree) is
+   begin
+      ABR := new T_Node'(Key, Data, Left, Right);
+   end setRootNode;
 
    -- TODO
 	function isEmpty (ABR : T_BinaryTree) return Boolean is

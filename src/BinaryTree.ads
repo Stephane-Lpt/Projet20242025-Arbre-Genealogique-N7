@@ -4,12 +4,7 @@ generic
 package BinaryTree is
 
    type T_BinaryTree is private;
-   type T_Node is record
-      Key               : Integer;
-      Data              : T_Data;
-      Left : T_BinaryTree;
-      Right  : T_BinaryTree;
-   end record;
+   type T_Node is private;
    
    type T_Position is (LEFT, RIGHT);
 
@@ -19,8 +14,10 @@ package BinaryTree is
    -- Initialiser un ABR ABR.  L'ABR est vide.
    procedure initializeBinaryTree (ABR : out T_BinaryTree) with
      Post => isEmpty (ABR);
+   
+   procedure setRootNode (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Data; Left : in T_BinaryTree; Right : in T_BinaryTree);
 
-   -- Est-ce qu'un ABR ABR est vide ?
+   -- Est-ce qu'un ABR est vide ?
    function isEmpty (ABR : T_BinaryTree) return Boolean;
 
    -- Obtenir le nombre d'éléments d'un ABR.
@@ -71,5 +68,12 @@ package BinaryTree is
 private
 
    type T_BinaryTree is access T_Node;
+   
+   type T_Node is record
+      Key               : Integer;
+      Data              : T_Data;
+      Left : T_BinaryTree;
+      Right  : T_BinaryTree;
+   end record;
 
 end BinaryTree;

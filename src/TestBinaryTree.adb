@@ -1,22 +1,18 @@
--- with BinaryTree; use BinaryTree;
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with BinaryTree;
 
 procedure TestBinaryTree is
-   -- ùTree : T_BinaryTree;
-   package StringBinaryTree is
-     new BinaryTree(T_Data => Integer);
-   use StringBinaryTree;
+   package IntegerBinaryTree is
+      new BinaryTree(T_Data => Integer); -- Instantiate BinaryTree with Integer data
+   use IntegerBinaryTree;
 
-   Tree : T_BinaryTree;
+   Tree : T_BinaryTree; -- Declare a binary tree
+   RootNode : T_Node;
 
 begin
-   Put("Hello");
+   Put_Line("Hello");
 
-   -- initializeBinaryTree(Tree);
-
-   Tree := new T_Node'(Key => 4, Data => 1, Left => Null, Right => Null);
-
+   -- Initialize the tree (it starts as empty)
+   initializeBinaryTree(Tree);
 
 end TestBinaryTree;

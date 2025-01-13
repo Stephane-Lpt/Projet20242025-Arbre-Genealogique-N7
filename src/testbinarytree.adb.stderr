@@ -1,3 +1,2 @@
-testbinarytree.adb:19:04: warning: possibly useless assignment to "Tree", value might not be referenced [-gnatwm]
-testbinarytree.adb:19:12: error: expected private type "T_BinaryTree" defined at binarytree.ads:6, instance at line 8
-testbinarytree.adb:19:12: error: found type access to "T_Node" defined at line 19
+testbinarytree.adb:10:04: warning: variable "RootNode" is never read and never assigned [-gnatwv]
+testbinarytree.adb:16:25: warning: "Tree" modified by call, but value might not be referenced [-gnatwm]
