@@ -6,13 +6,18 @@ procedure TestBinaryTree is
       new BinaryTree(T_Data => Integer); -- Instantiate BinaryTree with Integer data
    use IntegerBinaryTree;
 
-   Tree : T_BinaryTree; -- Declare a binary tree
-   RootNode : T_Node;
+   Fils : T_BinaryTree;
+   Parent1 : T_BinaryTree;
+   Parent2 : T_BinaryTree;
 
 begin
    Put_Line("Hello");
 
    -- Initialize the tree (it starts as empty)
-   initializeBinaryTree(Tree);
+   initializeTree(Fils);
+   initializeTree(Parent1);
+   initializeTree(Parent2);
+
+   setRootNode(Fils, 1, 1);
 
 end TestBinaryTree;

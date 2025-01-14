@@ -3,8 +3,8 @@ generic
 
 package BinaryTree is
 
-   type T_BinaryTree is private;
    type T_Node is private;
+   type T_BinaryTree is limited private;
    
    type T_Position is (LEFT, RIGHT);
 
@@ -12,10 +12,10 @@ package BinaryTree is
    Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
 
    -- Initialiser un ABR ABR.  L'ABR est vide.
-   procedure initializeBinaryTree (ABR : out T_BinaryTree) with
+   procedure initializeTree (ABR : out T_BinaryTree) with
      Post => isEmpty (ABR);
    
-   procedure setRootNode (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Data; Left : in T_BinaryTree; Right : in T_BinaryTree);
+   procedure setRootNode (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Data);
 
    -- Est-ce qu'un ABR est vide ?
    function isEmpty (ABR : T_BinaryTree) return Boolean;
@@ -34,8 +34,8 @@ package BinaryTree is
    -- Exception : Key_Absente_Exception si Clé n'est pas utilisée dans l'ABR
    function getData (ABR : in T_BinaryTree; Key : in Integer) return T_Data;
 
-   procedure addNode (ABR : in out T_BinaryTree; Key : in Integer; Node : in T_Node; Position : in T_Position) with
-     Pre => isPresent(ABR, Key);
+   --procedure addNode (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Node; Position : in T_Position) with
+     --Pre => isPresent(ABR, Key);
      --Post =>
      --  (Position = LEFT and getTree(ABR, Key).all.Left = Node) or
      --  (Position = RIGHT and getTree(ABR, Key).all.Right = Node);
@@ -66,7 +66,7 @@ package BinaryTree is
    procedure show (ABR : in T_BinaryTree);
 
 private
-
+   
    type T_BinaryTree is access T_Node;
    
    type T_Node is record

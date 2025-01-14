@@ -8,14 +8,14 @@ package body BinaryTree is
 		new Ada.Unchecked_Deallocation (Object => T_Node, Name => T_BinaryTree);
 
    -- TODO
-	procedure initializeBinaryTree(ABR: out T_BinaryTree) is
+	procedure initializeTree(ABR: out T_BinaryTree) is
 	begin
 		ABR := Null;
-   end initializeBinaryTree;
+   end initializeTree;
 
-   procedure setRootNode (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Data; Left : in T_BinaryTree; Right : in T_BinaryTree) is
+   procedure setRootNode (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Data) is
    begin
-      ABR := new T_Node'(Key, Data, Left, Right);
+      ABR := new T_Node'(Key, Data, Null, Null);
    end setRootNode;
 
    -- TODO
