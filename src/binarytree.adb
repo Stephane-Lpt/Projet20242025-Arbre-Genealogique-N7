@@ -7,24 +7,37 @@ package body BinaryTree is
 	procedure Free is
 		new Ada.Unchecked_Deallocation (Object => T_Node, Name => T_BinaryTree);
 
-   -- TODO
-	procedure initializeTree(ABR: out T_BinaryTree) is
+   -- Initialize empty tree
+	procedure initTree(ABR: out T_BinaryTree) is
 	begin
 		ABR := Null;
-   end initializeTree;
+   end initTree;
 
-   procedure setRootNode (ABR : in out T_BinaryTree; Key : in Integer; Data : in T_Data) is
+   -- Initialize root node
+   procedure setRootNode (ABR : in out T_BinaryTree; Element : in T_Element) is
    begin
-      ABR := new T_Node'(Key, Data, Null, Null);
+      ABR := new T_Node'(Element, Null, Null);
    end setRootNode;
 
-   -- TODO
+   -- Verify if ABR is empty (null)
 	function isEmpty (ABR : T_BinaryTree) return Boolean is
 	begin
 		return ABR = Null;
 	end isEmpty;
 
-   -- TODO
+   -- Verify if Element is present in ABR
+   function isPresent (ABR: in T_BinaryTree; Element : in T_Element) return boolean is
+   begin
+      if isEmpty (ABR) then
+         return False;
+      elsif ABR.all.Element = Element then
+         return True;
+      else
+         return isPresent(ABR.all.Left, Element) or else isPresent (ABR.all.Right, Element);
+      end if;
+   end isPresent;
+
+   -- Get the size (number of elements) of ABR
 	function getSize (ABR : in T_BinaryTree) return Integer is
 	begin
 		if ABR = null then
@@ -34,58 +47,37 @@ package body BinaryTree is
       end if;
 	end getSize;
 
-   -- TODO
-   function isPresent (ABR: in T_BinaryTree; Key: Integer) return boolean is
-   begin
-      if isEmpty (ABR) then
-         return False;
-      elsif ABR.all.key = Key then
-         return True;
-      else
-         return isPresent(ABR.all.Left, Key) or else isPresent (ABR.all.Right, Key);
-      end if;
-   end isPresent;
-
-   function getTree (ABR : in T_BinaryTree; Key : in Integer) return T_BinaryTree is
+   -- Search Tree by Element
+   function getTree (ABR : in T_BinaryTree; Element : in T_Element) return T_BinaryTree is
    begin
       return Null;
    end getTree;
 
-	procedure setData (ABR : in out T_BinaryTree ; Key : in Integer ; Data : in T_Data) is
-      Tree : T_BinaryTree;
-	begin
-      Tree := getTree(ABR, Key);
-      Tree.all.Data := Data;
-   end setData;
-
-   function getData (ABR : in T_BinaryTree ; Key : in Integer) return T_Data is
-	begin
-		return getTree(ABR, Key).all.Data;
-	end getData;
-
-   procedure addNode (ABR : in out T_BinaryTree; Key : in Integer; Node : in T_Node; Position : in T_Position) is
+   -- Add a node to the tree (to the left or the right)
+   procedure addNode (ABR : in out T_BinaryTree; NewElement : in T_Element; TargetElement : in T_Element; Position : in T_Position) is
+      Node : T_Node := new T_Node'(NewElement, Null, Null);
       Tree : T_BinaryTree;
    begin
-      if ABR.all.Key /= Key then
-         Tree := getTree(ABR, Key);
+      if ABR.all.Element /= TargetElement then
+         Tree := getTree(ABR, TargetElement);
       else
          Tree := ABR;
       end if;
 
       case Position is
          when RIGHT =>
-            Tree.all.Right.all := Node;
+            Tree.all.Right := Node;
          when LEFT =>
-            Tree.all.Left.all := Node;
+            Tree.all.Left := Node;
       end case;
    end addNode;
 
    -- TODO
-   procedure deleteNode (ABR : in out T_BinaryTree ; Key : in Integer) is
+   procedure deleteNode (ABR : in out T_BinaryTree; Element : in T_Element) is
       Tree : T_BinaryTree;
    begin
-      if ABR.all.Key /= Key then
-         Tree := getTree(ABR, Key);
+      if ABR.all.Element /= Element then
+         Tree := getTree(ABR, Element);
       else
          Tree := ABR;
       end if;
@@ -94,7 +86,7 @@ package body BinaryTree is
 	end deleteNode;
 
    -- TODO
-   procedure deleteNodeRecursive (ABR : in out T_BinaryTree ; Key : in Integer) is
+   procedure deleteNodeRecursive (ABR : in out T_BinaryTree; Element : in T_Element) is
 	begin
 		Null;	-- TODO : à changer
 	end deleteNodeRecursive;
@@ -109,7 +101,7 @@ package body BinaryTree is
    procedure show (ABR : in T_BinaryTree) is
    begin
       if not isEmpty (ABR) then
-         Put(ABR.all.Key);
+         Put_Generic(ABR.all.Element);
          show(ABR.all.Right);
          show(ABR.all.Left);
       end if;
