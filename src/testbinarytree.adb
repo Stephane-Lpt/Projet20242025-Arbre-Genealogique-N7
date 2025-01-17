@@ -1,50 +1,104 @@
-with Ada.Text_IO; use Ada.Text_IO;
-with Utils; use Utils;
-with BinaryTree;
+    with Ada.Text_IO; use Ada.Text_IO;
+    with Utils; use Utils;
+    with BinaryTree;
 
-procedure TestBinaryTree is
-    procedure PutDataWithKey (Element : in Character; Key : in Integer; Depth : in Integer := 0; Position : in T_Position := ROOT) is
+    procedure TestBinaryTree is
+        procedure PutInteger (Element : in Integer; Key : in Integer; Depth : in Integer := 0; Position : in T_Position := ROOT) is
+        begin
+        Put_Line(getIndent(Depth) & getBinaryTreePrefix(Position) & Integer'Image(Key) & ":" & Integer'Image(Element));
+        end PutInteger;
+
+        package IntegerBinaryTree is new BinaryTree
+            (
+                Put_Generic => PutInteger,
+                T_Element   => Integer
+            );
+    use IntegerBinaryTree;
+
+    -- TEST isEmpty --
+    procedure TestIsEmpty is
+        Tree1, Tree2 : T_BinaryTree;
     begin
-      Put_Line(getIndent(Depth) & getBinaryTreePrefix(Position) & Integer'Image(Key) & ":" & Element);
-    end PutDataWithKey;
+        initTree(Tree1);
 
-    package StringBinaryTree is new BinaryTree
-        (
-            Put_Generic => PutDataWithKey,
-            T_Element   => Character
-        );
-    use StringBinaryTree;
+        initRoot(Tree2, 1, 1);
 
-    Root : T_BinaryTree;
-    Tree1 : T_BinaryTree;
-    Tree2 : T_BinaryTree;
-    Tree3 : T_BinaryTree;
-    Tree4 : T_BinaryTree;
-    Tree5 : T_BinaryTree;
-    Tree6 : T_BinaryTree;
-    Tree7 : T_BinaryTree;
-    Tree8 : T_BinaryTree;
+        pragma Assert (isEmpty(Tree1));
+        pragma Assert (not isEmpty(Tree2));
+    end TestIsEmpty;
 
-begin
-    initRoot(Root, 1, 'A');
-    initRoot(Tree1, 2, 'B');
-    initRoot(Tree2, 3, 'C');
-    initRoot(Tree3, 4, 'D');
-    initRoot(Tree4, 5, 'E');
-    initRoot(Tree5, 6, 'F');
-    initRoot(Tree6, 7, 'G');
-    initRoot(Tree7, 8, 'H');
-    initRoot(Tree8, 9, 'I');
+    -- TEST addNode --
+    procedure TestAddNode is
+        RootTree, LeftTree, RightTree : T_BinaryTree;
+    begin
+        initRoot(RootTree, 1, 12);
+        initRoot(LeftTree, 2, 82);
+        initRoot(RightTree, 3, 23);
 
-    addNode(ABR => Root, NewNode => Tree1, TargetKey => 1, Position => LEFT);
-    addNode(ABR => Root, NewNode => Tree2, TargetKey => 1, Position => RIGHT);
-    addNode(ABR => Tree1, NewNode => Tree3, TargetKey => 2, Position => RIGHT);
-    addNode(ABR => Tree1, NewNode => Tree4, TargetKey => 2, Position => LEFT);
-    addNode(ABR => Tree2, NewNode => Tree5, TargetKey => 3, Position => RIGHT);
-    addNode(ABR => Tree2, NewNode => Tree6, TargetKey => 3, Position => LEFT);
-    addNode(ABR => Tree3, NewNode => Tree7, TargetKey => 4, Position => RIGHT);
-    addNode(ABR => Tree6, NewNode => Tree8, TargetKey => 7, Position => LEFT);
+        addNode(RootTree, LeftTree, 1, LEFt);
+        addNode(RootTree, RightTree, 1, RIGHT);
 
-    showTree(Root, PropToShow => Elements);
-end TestBinaryTree;
+        -- not working!
+        --pragma Assert(RootTree.all.Left.all = LeftTree);
+        --pragma Assert(RootTree.all.Right.all = RightTree);
+        --pragma Assert(RootTree.all.Left.Key = 2);
+        --pragma Assert(RootTree.all.Right.Key = 3);
+        --pragma Assert(RootTree.Left.all.Element = 82);
+        --pragma Assert(RootTree.Right.all.Element = 23);
+
+        -- TODO: add tests with ID's that aren't directly the ABR's root (need to implement getNode)
+    end TestAddNode;
+
+    -- TEST isPresent --
+    procedure TestIsPresent is
+        RootTree, Tree1, Tree2 : T_BinaryTree;
+    begin
+        initRoot(RootTree, 1, 12);
+        initRoot(Tree1, 2, 97);
+        initRoot(Tree2, 3, 78);
+
+        addNode (RootTree, Tree1, 1, LEFT);
+        addNode (Tree1, Tree2, 2, RIGHT);
+
+        pragma Assert (isPresent (RootTree, 1));
+        pragma Assert (isPresent (RootTree, 2));
+        pragma Assert (isPresent (RootTree, 3));
+        pragma Assert (not isPresent (RootTree, 4));
+    end TestIsPresent;
+
+    -- TEST getSize --
+    procedure TestGetSize is
+        Tree1, Tree2, Tree3, Tree4, Tree5 : T_BinaryTree;
+    begin
+        initTree (Tree1);
+
+        pragma Assert (getSize (Tree1) = 0);
+
+        initRoot(Tree1, 1, 12);
+        initRoot(Tree2, 2, 97);
+        initRoot(Tree3, 3, 78);
+        initRoot(Tree4, 4, 34);
+        initRoot(Tree5, 5, 90);
+
+        pragma Assert (getSize (Tree1) = 1);
+
+        addNode (Tree1, Tree2, 1, LEFT);
+        addNode (Tree1, Tree3, 1, RIGHT);
+
+        pragma Assert (getSize (Tree1) = 3);
+
+        addNode (Tree2, Tree4, 2, LEFT);
+        addNode (Tree3, Tree5, 2, RIGHT);
+
+        pragma Assert (getSize (Tree1) = 5);
+        pragma Assert (getSize (Tree2) = 2);
+        pragma Assert (getSize (Tree5) = 1);
+    end TestGetSize;
+
+    begin
+        TestIsEmpty;
+        TestAddNode;
+        TestIsPresent;
+
+    end TestBinaryTree;
 

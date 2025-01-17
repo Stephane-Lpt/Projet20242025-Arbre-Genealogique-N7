@@ -16,7 +16,6 @@ package body BinaryTree is
 
    -- Initialize root node
    procedure initRoot(ABR: in out T_BinaryTree; Key : in Integer; Element : in T_Element) is
-      --Node : T_BinaryTree := new T_Node'(Element, Null, Null);
    begin
       ABR := new T_Node'(Key, Element, Null, Null);
    end initRoot;
