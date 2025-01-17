@@ -5,8 +5,8 @@ project pim is
     -- SANS INCLURE "piles.ads", "piles.adb"...
     for Main use ("TestBinaryTree.adb");
 
-    for Object_Dir use "build/obj";  -- Directory for compiled object and ALI files
-    for Exec_Dir   use "build/bin"; -- Directory for executables
+    for Object_Dir use "../build/obj";  -- Directory for compiled object and ALI files
+    for Exec_Dir   use "../build/bin"; -- Directory for executables
 
     package Builder is
         for Default_Switches ("ada") use ("-s");
