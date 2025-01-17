@@ -1,6 +1,7 @@
 with Ada.Text_IO;            use Ada.Text_IO;
 with Ada.Integer_Text_IO;    use Ada.Integer_Text_IO;
 with Ada.Unchecked_Deallocation;
+with Utils; use Utils;
 
 package body BinaryTree is
 
@@ -65,6 +66,8 @@ package body BinaryTree is
       end if;
 
       case Position is
+         when ROOT =>
+            Null;
          when RIGHT =>
             --TempTree.all.Right := new T_Node'(NewElement, null, null);
             TempTree.all.Right := NewNode;
@@ -100,13 +103,41 @@ package body BinaryTree is
    end clean;
 
    -- TODO
-   procedure show (ABR : in T_BinaryTree) is
+   procedure showTree (ABR : in T_BinaryTree; PropToShow : in T_PropToShow := Keys; Depth : in Integer := 0; Position : in T_Position := ROOT) is
+      function getIndent(Depth : in Integer) return String is
+         IndentLength : Integer := Depth * 4;
+         Indent : String(1..IndentLength);
+      begin
+         for i in 1..IndentLength loop
+            Indent(i) := ' ';
+         end loop;
+
+         return Indent;
+      end getIndent;
+
+      function getShowPrefix(Position : in T_Position) return String is
+      begin
+         case Position is
+             when ROOT =>
+                return "/";
+             when RIGHT =>
+                return ">";
+             when LEFT =>
+                return "<";
+         end case;
+      end getShowPrefix;
    begin
       if not isEmpty (ABR) then
-         Put_Generic(ABR.all.Element);
-         show(ABR.all.Right);
-         show(ABR.all.Left);
+         if PropToShow = Keys then
+            Put_Line(getIndent(Depth) & getShowPrefix(Position) & Integer'Image(ABR.all.Key));
+         else
+            Put_Generic(ABR.all.Element, Depth, Position);
+         end if;
+         showTree(ABR.all.Right, PropToShow, Depth + 1, RIGHT);
+         showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT);
       end if;
-   end show;
+   end showTree;
+
+
 
 end BinaryTree;

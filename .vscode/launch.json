@@ -12,7 +12,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
+            "miDebuggerPath": "D:\\N7\\Programmation\\MinGW\\bin",
             "preLaunchTask": "Build test_binary_tree",
             "setupCommands": [
                 {

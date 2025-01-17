@@ -1,15 +1,16 @@
+with Utils; use Utils;
+
 generic
    type T_Element is private;
-   with procedure Put_Generic(Element : in T_Element);
-
+   with procedure Put_Generic(Element : in T_Element; Depth : Integer := 0; Position : in T_Position := ROOT);
+      
 package BinaryTree is
 
    type T_BinaryTree is limited private;
-   
-   type T_Position is (LEFT, RIGHT);
+   type T_PropToShow is (Keys, Elements);
 
-   Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
-   Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
+   --Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
+   --Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
 
    -- Initialize empty tree
    procedure initTree (ABR : out T_BinaryTree) with
@@ -33,7 +34,7 @@ package BinaryTree is
 
    -- Add a node to the tree (to the left or the right)
    procedure addNode (ABR : in out T_BinaryTree; NewNode : in T_BinaryTree; TargetKey : in Integer; Position : in T_Position) with
-     Pre => isPresent(ABR, TargetKey);
+     Pre => isPresent(ABR, TargetKey) and Position /= ROOT;
      --Pre => isPresent(ABR, TargetElement),
      --Post =>
       --(Position = LEFT and getTree(ABR, TargetElement).all.Left.all.Element = NewElement) or
@@ -54,7 +55,7 @@ package BinaryTree is
      Post => isEmpty (ABR);
 
    -- Show binary tree (parcours infixe)
-   procedure show (ABR : in T_BinaryTree);
+   procedure showTree (ABR : in T_BinaryTree; PropToShow : T_PropToShow := Keys; Depth : Integer := 0; Position : T_Position := ROOT);
 
 private
    
