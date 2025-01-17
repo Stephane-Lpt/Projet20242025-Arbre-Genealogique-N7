@@ -1,0 +1,18 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build test_binary_tree",
+            "type": "shell",
+            "command": "gprbuild -P src/pim.gpr",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}" // Use the workspace folder as the working directory
+            }
+        }
+    ]
+}
