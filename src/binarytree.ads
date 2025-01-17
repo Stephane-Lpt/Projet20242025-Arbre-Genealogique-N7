@@ -1,6 +1,6 @@
 generic
    type T_Element is private;
-   procedure Put_Generic is private;
+   with procedure Put_Generic(Element : in T_Element);
 
 package BinaryTree is
 
@@ -16,7 +16,7 @@ package BinaryTree is
      Post => isEmpty (ABR);
    
    -- Initialize root node
-   procedure setRootNode (ABR : in out T_BinaryTree; Element : in T_Element);
+   procedure initRoot(ABR : in out T_BinaryTree; Element : in T_Element);
 
    -- Verify if ABR is empty (null)
    function isEmpty (ABR : T_BinaryTree) return Boolean;
@@ -32,7 +32,7 @@ package BinaryTree is
    function getTree (ABR: in T_BinaryTree; Element : in T_Element) return T_BinaryTree;
 
    -- Add a node to the tree (to the left or the right)
-   procedure addNode (ABR : in out T_BinaryTree; NewElement : in T_Element; TargetElement : in T_Element; Position : in T_Position) with
+   procedure addNode (ABR : in out T_BinaryTree; NewNode : in T_BinaryTree; TargetElement : in T_Element; Position : in T_Position) with
      Pre => isPresent(ABR, TargetElement);
      --Pre => isPresent(ABR, TargetElement),
      --Post =>

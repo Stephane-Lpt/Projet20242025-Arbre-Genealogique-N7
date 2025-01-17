@@ -1,15 +1,16 @@
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Integer_Text_IO; use Ada.Text_IO;
 with BinaryTree;
 
 procedure TestBinaryTree is
 
    procedure Put_Integer(Int : in Integer) is
    begin
-      Put_Line(Int);
+      Ada.Integer_Text_IO.Put(Int);
    end;
 
    package IntegerBinaryTree is
-      new BinaryTree(Put_Generic => Put_Integer,T_Element => Integer, ); -- Instantiate BinaryTree with Integer data
+      new BinaryTree(Put_Generic => Put_Integer, T_Element => Integer); -- Instantiate BinaryTree with Integer data
    use IntegerBinaryTree;
 
    Fils : T_BinaryTree;
@@ -24,6 +25,5 @@ begin
    initTree(Parent1);
    initTree(Parent2);
 
-   setRootNode(Fils, 1);
-
+   initRoot(Fils, 10);
 end TestBinaryTree;

@@ -14,10 +14,11 @@ package body BinaryTree is
    end initTree;
 
    -- Initialize root node
-   procedure setRootNode (ABR : in out T_BinaryTree; Element : in T_Element) is
+   procedure initRoot(ABR: in out T_BinaryTree; Element : in T_Element) is
+      --Node : T_BinaryTree := new T_Node'(Element, Null, Null);
    begin
       ABR := new T_Node'(Element, Null, Null);
-   end setRootNode;
+   end initRoot;
 
    -- Verify if ABR is empty (null)
 	function isEmpty (ABR : T_BinaryTree) return Boolean is
@@ -54,21 +55,22 @@ package body BinaryTree is
    end getTree;
 
    -- Add a node to the tree (to the left or the right)
-   procedure addNode (ABR : in out T_BinaryTree; NewElement : in T_Element; TargetElement : in T_Element; Position : in T_Position) is
-      Node : T_Node := new T_Node'(NewElement, Null, Null);
-      Tree : T_BinaryTree;
+   procedure addNode (ABR : in out T_BinaryTree; NewNode : in T_BinaryTree; TargetElement : in T_Element; Position : in T_Position) is
+      TempTree : T_BinaryTree;
    begin
       if ABR.all.Element /= TargetElement then
-         Tree := getTree(ABR, TargetElement);
+         TempTree := getTree(ABR, TargetElement);
       else
-         Tree := ABR;
+         TempTree := ABR;
       end if;
 
       case Position is
          when RIGHT =>
-            Tree.all.Right := Node;
+            --TempTree.all.Right := new T_Node'(NewElement, null, null);
+            TempTree.all.Right := NewNode;
          when LEFT =>
-            Tree.all.Left := Node;
+            --TempTree.all.Left := new T_Node'(NewElement, null, null);
+            TempTree.all.Left := NewNode;
       end case;
    end addNode;
 
