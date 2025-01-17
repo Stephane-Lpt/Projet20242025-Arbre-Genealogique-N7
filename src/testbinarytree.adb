@@ -25,5 +25,6 @@ begin
    initTree(Parent1);
    initTree(Parent2);
 
-   initRoot(Fils, 10);
+   initRoot(Fils, 1, 10);
+   initRoot(Parent1, 2, 20);
 end TestBinaryTree;

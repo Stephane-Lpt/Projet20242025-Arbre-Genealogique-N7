@@ -14,10 +14,10 @@ package body BinaryTree is
    end initTree;
 
    -- Initialize root node
-   procedure initRoot(ABR: in out T_BinaryTree; Element : in T_Element) is
+   procedure initRoot(ABR: in out T_BinaryTree; Key : in Integer; Element : in T_Element) is
       --Node : T_BinaryTree := new T_Node'(Element, Null, Null);
    begin
-      ABR := new T_Node'(Element, Null, Null);
+      ABR := new T_Node'(Key, Element, Null, Null);
    end initRoot;
 
    -- Verify if ABR is empty (null)
@@ -27,14 +27,14 @@ package body BinaryTree is
 	end isEmpty;
 
    -- Verify if Element is present in ABR
-   function isPresent (ABR: in T_BinaryTree; Element : in T_Element) return boolean is
+   function isPresent (ABR: in T_BinaryTree; Key : in Integer) return boolean is
    begin
       if isEmpty (ABR) then
          return False;
-      elsif ABR.all.Element = Element then
+      elsif ABR.all.Key = Key then
          return True;
       else
-         return isPresent(ABR.all.Left, Element) or else isPresent (ABR.all.Right, Element);
+         return isPresent(ABR.all.Left, Key) or else isPresent (ABR.all.Right, Key);
       end if;
    end isPresent;
 
@@ -49,17 +49,17 @@ package body BinaryTree is
 	end getSize;
 
    -- Search Tree by Element
-   function getTree (ABR : in T_BinaryTree; Element : in T_Element) return T_BinaryTree is
+   function getNode (ABR : in T_BinaryTree; Key : in Integer) return T_BinaryTree is
    begin
       return Null;
-   end getTree;
+   end getNode;
 
    -- Add a node to the tree (to the left or the right)
-   procedure addNode (ABR : in out T_BinaryTree; NewNode : in T_BinaryTree; TargetElement : in T_Element; Position : in T_Position) is
+   procedure addNode (ABR : in out T_BinaryTree; NewNode : in T_BinaryTree; TargetKey : in Integer; Position : in T_Position) is
       TempTree : T_BinaryTree;
    begin
-      if ABR.all.Element /= TargetElement then
-         TempTree := getTree(ABR, TargetElement);
+      if ABR.all.Key /= TargetKey then
+         TempTree := getNode(ABR, TargetKey);
       else
          TempTree := ABR;
       end if;
@@ -75,11 +75,11 @@ package body BinaryTree is
    end addNode;
 
    -- TODO
-   procedure deleteNode (ABR : in out T_BinaryTree; Element : in T_Element) is
+   procedure deleteNode (ABR : in out T_BinaryTree; Key : in Integer) is
       Tree : T_BinaryTree;
    begin
-      if ABR.all.Element /= Element then
-         Tree := getTree(ABR, Element);
+      if ABR.all.Key /= Key then
+         Tree := getNode(ABR, Key);
       else
          Tree := ABR;
       end if;
@@ -88,7 +88,7 @@ package body BinaryTree is
 	end deleteNode;
 
    -- TODO
-   procedure deleteNodeRecursive (ABR : in out T_BinaryTree; Element : in T_Element) is
+   procedure deleteNodeRecursive (ABR : in out T_BinaryTree; Key : in Integer) is
 	begin
 		Null;	-- TODO : à changer
 	end deleteNodeRecursive;
