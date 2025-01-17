@@ -2,7 +2,7 @@ with Utils; use Utils;
 
 generic
    type T_Element is private;
-   with procedure Put_Generic(Element : in T_Element; Depth : Integer := 0; Position : in T_Position := ROOT);
+   with procedure Put_Generic(Element : in T_Element; Key : in Integer; Depth : Integer := 0; Position : in T_Position := ROOT);
       
 package BinaryTree is
 
