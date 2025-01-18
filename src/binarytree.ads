@@ -6,7 +6,7 @@ generic
       
 package BinaryTree is
 
-   type T_BinaryTree is limited private;
+   type T_BinaryTree is private;
    type T_PropToShow is (Keys, Elements);
 
    --Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
@@ -17,14 +17,14 @@ package BinaryTree is
      Post => isEmpty (ABR);
    
    -- Initialize root node
-   procedure initRoot(ABR : in out T_BinaryTree; Key : in Integer; Element : in T_Element);
+   procedure initRoot(ABR : out T_BinaryTree; Key : in Integer; Element : in T_Element);
 
    -- Verify if ABR is empty (null)
    function isEmpty (ABR : T_BinaryTree) return Boolean;
 
    -- Verify if Element is present in ABR
    function isPresent (ABR : in T_BinaryTree; Key : in Integer) return Boolean;
-
+   
    -- Get the size (number of elements) of ABR
    function getSize (ABR : in T_BinaryTree) return Integer with
      Post => getSize'Result >= 0 and (getSize'Result = 0) = isEmpty (ABR);

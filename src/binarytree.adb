@@ -15,13 +15,13 @@ package body BinaryTree is
    end initTree;
 
    -- Initialize root node
-   procedure initRoot(ABR: in out T_BinaryTree; Key : in Integer; Element : in T_Element) is
+   procedure initRoot(ABR: out T_BinaryTree; Key : in Integer; Element : in T_Element) is
    begin
       ABR := new T_Node'(Key, Element, Null, Null);
    end initRoot;
 
    -- Verify if ABR is empty (null)
-	function isEmpty (ABR : T_BinaryTree) return Boolean is
+	function isEmpty (ABR : in T_BinaryTree) return Boolean is
 	begin
 		return ABR = Null;
 	end isEmpty;
@@ -41,7 +41,7 @@ package body BinaryTree is
    -- Get the size (number of elements) of ABR
 	function getSize (ABR : in T_BinaryTree) return Integer is
 	begin
-		if ABR = null then
+		if isEmpty(ABR) then
          return 0;
       else
          return 1 + getSize(ABR.all.Left) + getSize (ABR.all.Right);
@@ -50,8 +50,21 @@ package body BinaryTree is
 
    -- Search Tree by Element
    function getNode (ABR : in T_BinaryTree; Key : in Integer) return T_BinaryTree is
+      TempResult : T_BinaryTree;
    begin
-      return Null;
+      if isEmpty(ABR) then
+         return null;
+      elsif ABR.all.Key = Key then
+         return ABR;
+      else
+         TempResult := getNode(ABR.all.Left, Key);
+
+         if TempResult /= Null then
+            return TempResult;
+         else
+            return getNode(ABR.all.Right, Key);
+         end if;
+      end if;
    end getNode;
 
    -- Add a node to the tree (to the left or the right)
