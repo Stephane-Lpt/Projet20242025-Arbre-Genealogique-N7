@@ -124,12 +124,104 @@ procedure TestBinaryTree is
 
    end TestGetNode;
 
+procedure TestProcess is
+   -- Déclaration des arbres
+   Tree1, Tree2, Tree3, Tree4, Tree5 : T_BinaryTree;
+   Stop_Flag : Boolean := False;
+
+   -- Callback qui marque le parcours comme terminé dès que la clé 3 est rencontrée
+   procedure ActionExample (ABR : in out T_BinaryTree; Stop : in out Boolean) is
+   begin
+      -- Arrêter si la clé du nœud est 3
+      if Get_Key(ABR) = 3 then
+         Stop := True;
+      end if;
+   end ActionExample;
+
+   procedure NoStopActionExample (ABR : in out T_BinaryTree; Stop : in out Boolean) is
+   begin
+      if Get_Key(ABR) = 99 then
+         Stop := True;
+      end if;
+   end NoStopActionExample;
+
+begin
+   -- Initialisation des arbres
+   initRoot(Tree1, 1, 10);
+   initRoot(Tree2, 2, 20);
+   initRoot(Tree3, 3, 30);
+   initRoot(Tree4, 4, 40);
+   initRoot(Tree5, 5, 50);
+
+   -- Ajouter des nœuds aux arbres
+   addNode(Tree1, Tree2, 1, LEFT);  -- Ajoute Tree2 comme enfant gauche de Tree1
+   addNode(Tree1, Tree3, 1, RIGHT); -- Ajoute Tree3 comme enfant droit de Tree1
+   addNode(Tree3, Tree4, 3, LEFT);  -- Ajoute Tree4 comme enfant gauche de Tree3
+   addNode(Tree4, Tree5, 4, RIGHT); -- Ajoute Tree5 comme enfant droit de Tree4
+
+   -- Test 1: Vérification si le parcours s'arrête lorsqu'il atteint le nœud clé 5
+   Stop_Flag := False;
+   Put_Line("Test 1: Parcours jusqu'à l'origine (clé 1)");
+   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag);
+   
+   -- Vérifier si le flag Stop a été mis à True
+   pragma Assert(Stop_Flag, "Test 1 échoué: Le parcours n'a pas trouvé la clé 1");
+   if Stop_Flag then
+      Put_Line("Test 1 réussi: Le parcours s'est arrêté directement après avoir trouvé l'origine (clé 1)");
+   else
+      Put_Line("Test 1 échoué: Le parcours n'a pas trouvé la clé 1");
+   end if;
+
+   -- Test 2: Parcours avec arrêt lorsque la clé 3 est rencontrée
+   Stop_Flag := False;  -- Réinitialiser le flag avant chaque test
+   Put_Line("Test 2: Parcours jusqu'à la clé 3...");
+   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag);
+   
+   -- Vérifier si le flag Stop a été mis à True
+   pragma Assert(Stop_Flag, "Test 2 échoué: Le parcours n'a pas trouvé la clé 3.");
+   if Stop_Flag then
+      Put_Line("Test 2 réussi: Le parcours s'est arrêté directement après avoir trouvé la clé 3.");
+   else
+      Put_Line("Test 2 échoué: Le parcours n'a pas trouvé la clé 3.");
+   end if;
+
+   -- Test 3: Vérification si le parcours s'arrête lorsqu'il atteint le nœud clé 5
+   Stop_Flag := False;
+   Put_Line("Test 3: Parcours jusqu'à la clé 5...");
+   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag);
+   
+   -- Vérifier si le flag Stop a été mis à True
+   pragma Assert(Stop_Flag, "Test 3 échoué: Le parcours n'a pas trouvé la clé 5.");
+   if Stop_Flag then
+      Put_Line("Test 3 réussi: Le parcours s'est arrêté directement après avoir trouvé la clé 5.");
+   else
+      Put_Line("Test 3 échoué: Le parcours n'a pas trouvé la clé 5.");
+   end if;
+
+   -- Test 4: Vérifier le comportement lorsque la clé recherchée n'existe pas
+   Stop_Flag := False;
+   Put_Line("Test 4: Recherche d'une clé inexistante (par exemple 99)...");
+   traverseTreeAndApply(Tree1, NoStopActionExample'Access, Stop_Flag);
+   
+   -- Vérifier si le flag Stop est resté False
+   pragma Assert(not Stop_Flag, "Test 4 échoué: La clé 99 a été trouvée alors qu'elle n'existe pas.");
+   if Stop_Flag then
+      Put_Line("Test 4 échoué: La clé 99 a été trouvée alors qu'elle n'existe pas.");
+   else
+      Put_Line("Test 4 réussi: La clé 99 n'existe pas dans l'arbre donc le parcours ne s'est jamais arrêté.");
+   end if;
+
+end TestProcess;
+
+
+
 begin
     TestIsEmpty;
     --TestAddNode;
     TestIsPresent;
    TestGetSize;
    TestGetNode;
+   TestProcess;
 
 end TestBinaryTree;
 

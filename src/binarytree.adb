@@ -127,4 +127,39 @@ package body BinaryTree is
       end if;
    end showTree;
 
+   procedure traverseTreeAndApply (ABR : in out T_BinaryTree; 
+                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Stop : in out Boolean); 
+                              Stop : in out Boolean) is
+   begin
+      -- Si l'arbre est vide ou si le flag Stop est à True, on arrête immédiatement
+      if ABR = null or else Stop then
+         return;
+      end if;
+
+      -- Appliquer la fonction de traitement sur le nœud courant
+      ActionCallback(ABR, Stop);
+
+      -- Si le parcours doit s'arrêter, on ne continue pas
+      if Stop then
+         return;
+      end if;
+
+      -- Parcours du sous-arbre gauche si présent et si le flag Stop n'est pas à True
+      if ABR.all.Left /= null then
+         traverseTreeAndApply(ABR.all.Left, ActionCallback, Stop);
+      end if;
+
+      -- Parcours du sous-arbre droit si présent et si le flag Stop n'est pas à True
+      if ABR.all.Right /= null then
+         traverseTreeAndApply(ABR.all.Right, ActionCallback, Stop);
+      end if;
+   end traverseTreeAndApply;
+
+   function Get_Key (Tree : T_BinaryTree) return Integer is
+   begin
+      return Tree.Key;
+   end Get_Key;
+
+
+
 end BinaryTree;

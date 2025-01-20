@@ -3,7 +3,7 @@ with Utils; use Utils;
 generic
    type T_Element is private;
    with procedure Put_Generic(Element : in T_Element; Key : in Integer; Depth : Integer := 0; Position : in T_Position := ROOT);
-      
+
 package BinaryTree is
 
    type T_BinaryTree is private;
@@ -58,6 +58,14 @@ package BinaryTree is
    -- Show binary tree (parcours infixe)
    procedure showTree (ABR : in T_BinaryTree; PropToShow : T_PropToShow := Keys; Depth : Integer := 0; Position : T_Position := ROOT);
 
+  -- Parcours récursif de l'arbre et application d'une fonction donnée en argument sur chaque noeud du tableau 
+  -- jusqu'à ce que la fonction de callback renvoie Stop = True
+   procedure traverseTreeAndApply (ABR : in out T_BinaryTree; 
+                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Stop : in out Boolean); 
+                              Stop : in out  Boolean);
+
+  function Get_Key (Tree : T_BinaryTree) return Integer;
+     
 private
    
    type T_Node;
