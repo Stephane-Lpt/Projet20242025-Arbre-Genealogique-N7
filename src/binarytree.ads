@@ -35,6 +35,7 @@ package BinaryTree is
    -- Add a node to the tree (to the left or the right)
    procedure addNode (ABR : in out T_BinaryTree; NewNode : in T_BinaryTree; TargetKey : in Integer; Position : in T_Position) with
      Pre => isPresent(ABR, TargetKey) and Position /= ROOT;
+     -- TODO : ajoute precondition pour que isEmpty(getNode(ABR, TargetKey).Position) 
      --Pre => isPresent(ABR, TargetElement),
      --Post =>
       --(Position = LEFT and getTree(ABR, TargetElement).all.Left.all.Element = NewElement) or

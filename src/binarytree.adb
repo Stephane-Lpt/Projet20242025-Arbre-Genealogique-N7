@@ -114,13 +114,13 @@ package body BinaryTree is
       Null;
    end clean;
 
-   procedure showTree (ABR : in T_BinaryTree; PropToShow : in T_PropToShow := Keys; Depth : in Integer := 0; Position : in T_Position := ROOT) is
+   procedure showTree (ABR : in T_BinaryTree; PropToShow : in T_PropToShow := Keys; Depth : in Integer := 0; Position : in T_Position := ROOT; Verbosity : in Integer := 1) is
    begin
       if not isEmpty (ABR) then
          if PropToShow = Keys then
             Put_Line(getIndent(Depth) & getBinaryTreePrefix(Position) & Integer'Image(ABR.all.Key));
          else
-            Put_Generic(ABR.all.Element, ABR.all.Key, Depth, Position);
+            Put_Generic(ABR.all.Element, ABR.all.Key, Depth, Position, Verbosity);
          end if;
          showTree(ABR.all.Right, PropToShow, Depth + 1, RIGHT);
          showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT);
