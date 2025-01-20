@@ -18,13 +18,6 @@ package body FamilyTree is
       Null;
    end getGenerationsCount;
 
-   -- 2. Ajouter un parent (mère ou père) à un noeud donné.
-   procedure addParent
-     (ABR : in out T_BinaryTree; Key : in Integer; Parent : in T_Person) is
-   begin
-      Null;
-   end addParent;
-
    -- 3. Obtenir le nombre d’ancêtres connus (lui compris) d’un individu donné
    function getAncestorsCount
      (ABR : in T_BinaryTree; Key : in Integer) return Integer is
