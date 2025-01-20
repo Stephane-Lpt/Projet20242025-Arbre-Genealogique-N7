@@ -62,7 +62,7 @@ package body BinaryTree is
          if TempResult /= Null then
             return TempResult;
          else
-            return getNode(ABR.all.Right, Key);
+            return getNode (ABR.all.Right, Key);
          end if;
       end if;
    end getNode;
@@ -113,7 +113,6 @@ package body BinaryTree is
    begin
       Null;
    end clean;
-
 
    procedure showTree (ABR : in T_BinaryTree; PropToShow : in T_PropToShow := Keys; Depth : in Integer := 0; Position : in T_Position := ROOT) is
    begin

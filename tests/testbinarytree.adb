@@ -96,7 +96,7 @@ procedure TestBinaryTree is
    end TestGetSize;
 
    procedure TestGetNode is
-      Tree1, Tree2, Tree3, Tree4, Tree5, FoundTree : T_BinaryTree;
+      Tree1, Tree2, Tree3, Tree4, Tree5, FoundRootTree, FoundChildTree, NotFoundTree : T_BinaryTree;
    begin
       initRoot(Tree1, 1, 10);
       initRoot(Tree2, 2, 20);
@@ -109,12 +109,18 @@ procedure TestBinaryTree is
       addNode(Tree3, Tree4, 3, LEFT);
       addNode(Tree4, Tree5, 4, RIGHT);
 
-      --  showTree(Tree1);
 
-      FoundTree := getNode(Tree1, 3);
+      -- ROOT
+      FoundRootTree := getNode(Tree1, 1);
+      pragma Assert (FoundRootTree = Tree1);
 
-      showTree(FoundTree);
+      -- CHILD
+      FoundChildTree := getNode(Tree1, 3);
+      pragma Assert (FoundChildTree = Tree3);
 
+      -- NON-EXISTENT
+      NotFoundTree := getNode(Tree1, 6);
+      pragma Assert (isEmpty(NotFoundTree));
 
    end TestGetNode;
 
