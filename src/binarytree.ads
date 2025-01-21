@@ -65,9 +65,6 @@ package BinaryTree is
                               Stop : in out  Boolean;
                               Result: in out T_BinaryTree);
 
-   procedure Display_Tree (ABR: in T_BinaryTree; Depth: Integer := 0);
-
-
   function getKey (ABR : T_BinaryTree) return Integer;
 
   function getLeftChild (ABR : T_BinaryTree) return T_BinaryTree;

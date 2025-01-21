@@ -31,10 +31,10 @@ package body BinaryTree is
    begin
       if isEmpty (ABR) then
          return False;
-      elsif getKey(ABR) = Key then
+      elsif ABR.all.Key = Key then
          return True;
       else
-         return isPresent(getLeftChild(ABR), Key) or else isPresent (getRightChild(ABR), Key);
+         return isPresent(ABR.all.Left, Key) or else isPresent (ABR.all.Right, Key);
       end if;
    end isPresent;
 
@@ -44,7 +44,7 @@ package body BinaryTree is
 		if isEmpty(ABR) then
          return 0;
       else
-         return 1 + getSize(getLeftChild(ABR)) + getSize (getRightChild(ABR));
+         return 1 + getSize(ABR.all.Left) + getSize (ABR.all.Right);
       end if;
 	end getSize;
 
@@ -54,15 +54,15 @@ package body BinaryTree is
    begin
       if isEmpty(ABR) then
          return null;
-      elsif getKey(ABR) = Key then
+      elsif ABR.all.Key = Key then
          return ABR;
       else
-         TempResult := getNode(getLeftChild(ABR), Key);
+         TempResult := getNode(ABR.all.Left, Key);
 
          if TempResult /= Null then
             return TempResult;
          else
-            return getNode (getRightChild(ABR), Key);
+            return getNode (ABR.all.Right, Key);
          end if;
       end if;
    end getNode;
@@ -173,40 +173,6 @@ package body BinaryTree is
          showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT);
       end if;
    end showTree;
-
-   procedure Display_Tree (ABR : T_BinaryTree; Depth : Integer := 0) is
-   Indentation : String(1 .. Depth * 2); -- Crée une chaîne d'indentation
-   begin
-      -- Générer l'indentation
-      for I in 1 .. Depth * 2 loop
-         Indentation(I) := ' ';
-      end loop;
-
-      if not isEmpty(ABR) then
-         -- Afficher la clé du noeud avec l'indentation pour la profondeur
-         Put_Line(Indentation & "Node Key: " & Integer'Image(getKey(ABR)));
-
-         -- Afficher le lien vers l'enfant gauche avec flèche
-         if not isEmpty(getLeftChild(ABR)) then
-            Put_Line(Indentation & "  |-- Link to Left Child --> " & Integer'Image(getKey(getLeftChild(ABR))));
-         else
-            Put_Line(Indentation & "  |-- No Left Child");
-         end if;
-
-         -- Afficher le lien vers l'enfant droit avec flèche
-         if not isEmpty(getRightChild(ABR)) then
-            Put_Line(Indentation & "  |-- Link to Right Child --> " & Integer'Image(getKey(getRightChild(ABR))));
-         else
-            Put_Line(Indentation & "  |-- No Right Child");
-         end if;
-
-         -- Récursion pour afficher les sous-arbres
-         Display_Tree(getLeftChild(ABR), Depth + 1);
-         Display_Tree(getRightChild(ABR), Depth + 1);
-      end if;
-   end Display_Tree;
-
-
 
    procedure traverseTreeAndApply (ABR : in out T_BinaryTree; 
                               ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Stop : in out Boolean; Result: in out T_BinaryTree); 
