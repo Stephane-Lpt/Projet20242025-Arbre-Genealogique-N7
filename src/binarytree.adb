@@ -116,9 +116,7 @@ package body BinaryTree is
          -- Si la clé du nœud courant correspond à la clé recherchée
          if ABR.all.Key = Key then
             -- Mettre à jour le pointeur du parent pour supprimer la référence au sous-arbre
-            if Parent = null then
-               ABR := null;  -- Mise à null si c'est la racine
-            else
+            if Parent /= null then
                if Parent.all.Left = ABR then
                   Parent.all.Left := null;  -- Mise à null si c'est le sous-arbre gauche
                elsif Parent.all.Right = ABR then
@@ -126,8 +124,8 @@ package body BinaryTree is
                end if;
             end if;
 
-            -- Supprimer le nœud courant et ses descendants
-            ABR := null;
+            -- Supprimer le nœud courant (libère la mémoire) et ses descendants
+            Free(ABR);
             Stop := True;  -- On arrête le parcours après suppression
             return;
          end if;
