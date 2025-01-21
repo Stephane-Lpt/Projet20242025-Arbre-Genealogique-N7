@@ -103,57 +103,54 @@ package body BinaryTree is
 	end deleteNode;
 
    procedure deleteNodeRecursive (ABR : in out T_BinaryTree; Key : in Integer) is
-      childNode : T_BinaryTree;
       Stop_Flag : Boolean := False;
-      Result: T_BinaryTree;
-      -- Callback vérifie si le noeud courant est l'enfant du noeud à supprimer (génération -1)
-      procedure getNodeChild (ABR : in out T_BinaryTree; Stop : in out Boolean; Result : in out T_BinaryTree) is
-         LeftChild: T_BinaryTree;
-         RightChild: T_BinaryTree;
-         nodeToDelete: T_BinaryTree := getNode(ABR, Key);
+      ABRParent : T_BinaryTree;
+      -- Procédure pour supprimer tous les nœuds descendants d'un nœud
+      procedure deleteSubTree (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean) is
       begin
-         if ABR = null then
-            Stop := True;
-         elsif getLeftChild(ABR) = nodeToDelete then
-            LeftChild := getLeftChild(ABR); -- Copie du noeud enfant
-            setLeftChild(ABR, null);
-            ABR := LeftChild;
-            Stop := True;
-         elsif getRightChild(ABR) = nodeToDelete then
-            RightChild := getRightChild(ABR); -- Copie du noeud enfant
-            setRightChild(ABR, null);
-            ABR := RightChild;
-            Stop := True;
-         else
-            getNodeChild (LeftChild, Stop_Flag, Result); -- Parcours du sous-arbre gauche
-            getNodeChild (RightChild, Stop_Flag, Result); -- Parcours du sous-arbre droit
-         end if;   
-      end getNodeChild;
+         -- Si l'arbre est vide ou si le parcours doit être arrêté, rien à faire
+         if ABR = null or else Stop then
+            return;
+         end if;
 
-      -- Callback vérifie si le noeud courant est l'enfant du noeud à supprimer (génération -1)         
-      procedure deleteSubTreeWithoutOriginalPointer (ABR : in out T_BinaryTree; Stop : in out Boolean; Result: in out T_BinaryTree) is
-         LeftChild: T_BinaryTree;
-         RightChild: T_BinaryTree;
-      begin
-         if not isEmpty(ABR) then
-            LeftChild := getLeftChild(ABR);
-            if not isEmpty(LeftChild)  then
-               deleteSubTreeWithoutOriginalPointer(LeftChild, Stop, Result);
+         -- Si la clé du nœud courant correspond à la clé recherchée
+         if ABR.all.Key = Key then
+            -- Mettre à jour le pointeur du parent pour supprimer la référence au sous-arbre
+            if Parent = null then
+               ABR := null;  -- Mise à null si c'est la racine
+            else
+               if Parent.all.Left = ABR then
+                  Parent.all.Left := null;  -- Mise à null si c'est le sous-arbre gauche
+               elsif Parent.all.Right = ABR then
+                  Parent.all.Right := null;  -- Mise à null si c'est le sous-arbre droit
+               end if;
             end if;
 
-            RightChild := getRightChild(ABR);
-            if not isEmpty(RightChild) then
-               deleteSubTreeWithoutOriginalPointer(RightChild, Stop, Result);
-            end if;
-            
-            Free(ABR);
-         end if;   
-      end deleteSubTreeWithoutOriginalPointer;
-      
-	begin
-      traverseTreeAndApply(ABR, getNodeChild'Access, Stop_Flag, Result);
-      traverseTreeAndApply(ABR, deleteSubTreeWithoutOriginalPointer'Access, Stop_Flag, Result);
-	end deleteNodeRecursive;
+            -- Supprimer le nœud courant et ses descendants
+            ABR := null;
+            Stop := True;  -- On arrête le parcours après suppression
+            return;
+         end if;
+
+         -- Parcours du sous-arbre gauche
+         if ABR.all.Left /= null then
+            traverseTreeAndApply(ABR.all.Left, ABR, deleteSubTree'Access, Stop);
+         end if;
+
+         -- Parcours du sous-arbre droit
+         if ABR.all.Right /= null then
+            traverseTreeAndApply(ABR.all.Right, ABR, deleteSubTree'Access, Stop);
+         end if;
+      end deleteSubTree;
+
+   begin
+      initTree (ABRParent);
+      -- Initialiser le parent à null car il n'y a pas de parent au niveau de la racine
+      traverseTreeAndApply(ABR, ABRParent, deleteSubTree'Access, Stop_Flag);
+   end deleteNodeRecursive;
+
+
+
 
    -- TODO
    procedure clean (ABR : in out T_BinaryTree) is
@@ -175,9 +172,9 @@ package body BinaryTree is
    end showTree;
 
    procedure traverseTreeAndApply (ABR : in out T_BinaryTree; 
-                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Stop : in out Boolean; Result: in out T_BinaryTree); 
-                              Stop : in out Boolean;
-                              Result: in out T_BinaryTree) is
+                              Parent : in out T_BinaryTree;
+                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean); 
+                              Stop : in out Boolean) is
    begin
       -- Si l'arbre est vide ou si le flag Stop est à True, on arrête immédiatement
       if ABR = null or else Stop then
@@ -185,7 +182,7 @@ package body BinaryTree is
       end if;
 
       -- Appliquer la fonction de traitement sur le nœud courant
-      ActionCallback(ABR, Stop, Result);
+      ActionCallback(ABR, Parent, Stop);
 
       -- Si le parcours doit s'arrêter, on ne continue pas
       if Stop then
@@ -194,12 +191,12 @@ package body BinaryTree is
 
       -- Parcours du sous-arbre gauche si présent et si le flag Stop n'est pas à True
       if ABR.all.Left /= null then
-         traverseTreeAndApply(ABR.all.Left, ActionCallback, Stop, Result);
+         traverseTreeAndApply(ABR.all.Left, ABR, ActionCallback, Stop);
       end if;
 
       -- Parcours du sous-arbre droit si présent et si le flag Stop n'est pas à True
       if ABR.all.Right /= null then
-         traverseTreeAndApply(ABR.all.Right, ActionCallback, Stop, Result);
+         traverseTreeAndApply(ABR.all.Right, ABR, ActionCallback, Stop);
       end if;
    end traverseTreeAndApply;
 

@@ -61,9 +61,9 @@ package BinaryTree is
   -- Parcours récursif de l'arbre et application d'une fonction donnée en argument sur chaque noeud du tableau 
   -- jusqu'à ce que la fonction de callback renvoie Stop = True
    procedure traverseTreeAndApply (ABR : in out T_BinaryTree; 
-                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Stop : in out Boolean; Result: in out T_BinaryTree); 
-                              Stop : in out  Boolean;
-                              Result: in out T_BinaryTree);
+                              Parent: in out T_BinaryTree;
+                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean); 
+                              Stop : in out  Boolean);
 
   function getKey (ABR : T_BinaryTree) return Integer;
 
