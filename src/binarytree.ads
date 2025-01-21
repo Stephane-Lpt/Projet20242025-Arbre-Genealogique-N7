@@ -9,8 +9,8 @@ package BinaryTree is
    type T_BinaryTree is private;
    type T_PropToShow is (Keys, Elements);
 
-   --Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
-   --Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
+   Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
+   Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
 
    -- Initialize empty tree
    procedure initTree (ABR : out T_BinaryTree) with
@@ -48,7 +48,6 @@ package BinaryTree is
    -- Delete a node element and all his children
    procedure deleteNodeRecursive
      (ABR : in out T_BinaryTree; Key : in Integer) with
-     Pre => isPresent (ABR, Key),
      Post => getSize(ABR) = getSize (ABR)'Old - getSize(getNode(ABR, Key))'Old and not isPresent (ABR, Key);
 
    -- Delete all elements in Tree

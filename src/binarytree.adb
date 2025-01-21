@@ -108,6 +108,7 @@ package body BinaryTree is
       -- Procédure pour supprimer tous les nœuds descendants d'un nœud
       procedure deleteSubTree (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean) is
       begin
+         
          -- Si l'arbre est vide ou si le parcours doit être arrêté, rien à faire
          if ABR = null or else Stop then
             return;
@@ -142,6 +143,11 @@ package body BinaryTree is
       end deleteSubTree;
 
    begin
+
+      if isPresent (ABR, Key) = False then
+         raise Absent_Key_Exception; -- La clé n'est pas présente dans l'arbre
+      end if;
+      
       initTree (ABRParent);
       -- Initialiser le parent à null car il n'y a pas de parent au niveau de la racine
       traverseTreeAndApply(ABR, ABRParent, deleteSubTree'Access, Stop_Flag);
