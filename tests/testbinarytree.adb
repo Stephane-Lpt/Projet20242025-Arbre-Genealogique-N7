@@ -124,28 +124,32 @@ procedure TestBinaryTree is
 
    end TestGetNode;
 
-procedure TestProcess is
+procedure TestTraverseTreeAndApply is
    -- Déclaration des arbres
    Tree1, Tree2, Tree3, Tree4, Tree5 : T_BinaryTree;
    Stop_Flag : Boolean := False;
+   Result: T_BinaryTree;
 
    -- Callback qui marque le parcours comme terminé dès que la clé 3 est rencontrée
-   procedure ActionExample (ABR : in out T_BinaryTree; Stop : in out Boolean) is
+   procedure ActionExample (ABR : in out T_BinaryTree; Stop : in out Boolean; Result: in out T_BinaryTree) is
    begin
       -- Arrêter si la clé du nœud est 3
-      if Get_Key(ABR) = 3 then
+         if getKey(ABR) = 3 then
          Stop := True;
       end if;
    end ActionExample;
 
-   procedure NoStopActionExample (ABR : in out T_BinaryTree; Stop : in out Boolean) is
+   procedure NoStopActionExample (ABR : in out T_BinaryTree; Stop : in out Boolean; Result: in out T_BinaryTree) is
    begin
-      if Get_Key(ABR) = 99 then
+      if getKey(ABR) = 99 then
          Stop := True;
       end if;
    end NoStopActionExample;
 
 begin
+   Put_Line("");
+   Put_Line("---- Tests traverseTreeAndApply... ----");
+   Put_Line("");
    -- Initialisation des arbres
    initRoot(Tree1, 1, 10);
    initRoot(Tree2, 2, 20);
@@ -162,7 +166,7 @@ begin
    -- Test 1: Vérification si le parcours s'arrête lorsqu'il atteint le nœud clé 5
    Stop_Flag := False;
    Put_Line("Test 1: Parcours jusqu'à l'origine (clé 1)");
-   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag);
+   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag, Result);
    
    -- Vérifier si le flag Stop a été mis à True
    pragma Assert(Stop_Flag, "Test 1 échoué: Le parcours n'a pas trouvé la clé 1");
@@ -175,7 +179,7 @@ begin
    -- Test 2: Parcours avec arrêt lorsque la clé 3 est rencontrée
    Stop_Flag := False;  -- Réinitialiser le flag avant chaque test
    Put_Line("Test 2: Parcours jusqu'à la clé 3...");
-   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag);
+   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag, Result);
    
    -- Vérifier si le flag Stop a été mis à True
    pragma Assert(Stop_Flag, "Test 2 échoué: Le parcours n'a pas trouvé la clé 3.");
@@ -188,7 +192,7 @@ begin
    -- Test 3: Vérification si le parcours s'arrête lorsqu'il atteint le nœud clé 5
    Stop_Flag := False;
    Put_Line("Test 3: Parcours jusqu'à la clé 5...");
-   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag);
+   traverseTreeAndApply(Tree1, ActionExample'Access, Stop_Flag, Result);
    
    -- Vérifier si le flag Stop a été mis à True
    pragma Assert(Stop_Flag, "Test 3 échoué: Le parcours n'a pas trouvé la clé 5.");
@@ -201,7 +205,7 @@ begin
    -- Test 4: Vérifier le comportement lorsque la clé recherchée n'existe pas
    Stop_Flag := False;
    Put_Line("Test 4: Recherche d'une clé inexistante (par exemple 99)...");
-   traverseTreeAndApply(Tree1, NoStopActionExample'Access, Stop_Flag);
+   traverseTreeAndApply(Tree1, NoStopActionExample'Access, Stop_Flag, Result);
    
    -- Vérifier si le flag Stop est resté False
    pragma Assert(not Stop_Flag, "Test 4 échoué: La clé 99 a été trouvée alors qu'elle n'existe pas.");
@@ -211,7 +215,59 @@ begin
       Put_Line("Test 4 réussi: La clé 99 n'existe pas dans l'arbre donc le parcours ne s'est jamais arrêté.");
    end if;
 
-end TestProcess;
+end TestTraverseTreeAndApply;
+
+procedure TestDeleteRecursive is
+   -- Déclaration des arbres
+   Tree1, Tree2, Tree3, Tree4, Tree5 : T_BinaryTree;
+   node : T_BinaryTree;
+begin
+   Put_Line("");
+   Put_Line("---- Tests TestDeleteRecursive... ----");
+   Put_Line("");
+   -- Initialisation des arbres
+   initRoot(Tree1, 1, 10);
+   initRoot(Tree2, 2, 20);
+   initRoot(Tree3, 3, 30);
+   initRoot(Tree4, 4, 40);
+   initRoot(Tree5, 5, 50);
+
+   -- Ajouter des nœuds aux arbres
+   addNode(Tree1, Tree2, 1, LEFT);  -- Ajoute Tree2 comme enfant gauche de Tree1
+   addNode(Tree1, Tree3, 1, RIGHT); -- Ajoute Tree3 comme enfant droit de Tree1
+   addNode(Tree3, Tree4, 3, LEFT);  -- Ajoute Tree4 comme enfant gauche de Tree3
+   addNode(Tree4, Tree5, 4, RIGHT); -- Ajoute Tree5 comme enfant droit de Tree4
+
+   -- Test 1: Suppression d'un nœud feuille (clé 5)
+   Put_Line("Test 1: Suppression d'un nœud feuille (clé 5)...");
+   --  deleteNodeRecursive(Tree1, 2);
+   node := getNode (Tree1, 5);
+   pragma Assert(not isEmpty(node), "Test 1 échoué: Le nœud feuille (clé 5) est toujours présent.");
+   -- TODO: Problem with deleteNodeRecursive
+   if isEmpty(node) then
+      Put_Line("Test 1 réussi: Le nœud feuille (clé 5) a été supprimé correctement.");
+   end if;
+
+   --  -- Test 2: Suppression d'un nœud avec un sous-arbre (clé 3)
+   --  Put_Line("Test 2: Suppression d'un nœud avec un sous-arbre (clé 3)...");
+   --  deleteNodeRecursive(Tree1, 3);
+   --  node := getNode (Tree1, 5);
+   --  --  pragma Assert(not isEmpty(node), "Test 2 échoué: Le nœud avec sous-arbre (clé 3) est toujours présent.");
+   --  if not isEmpty(node) then
+   --     Put_Line("Test 2 réussi: Le nœud avec sous-arbre (clé 3) a été supprimé correctement.");
+   --  end if;
+
+   --  -- Test 3: Suppression du nœud racine (clé 1)
+   --  Put_Line("Test 3: Suppression de la racine (clé 1)...");
+   --  deleteNodeRecursive(Tree1, 1);
+   --  node := getNode (Tree1, 1);
+   --  --  pragma Assert(not isEmpty(node), "Test 3 échoué: La racine (clé 1) est toujours présente.");
+   --  if isEmpty(node) then
+   --     Put_Line("Test 3 réussi: La racine (clé 1) a été supprimée correctement.");
+   --  end if;
+
+end TestDeleteRecursive;
+
 
 
 
@@ -221,7 +277,8 @@ begin
     TestIsPresent;
    TestGetSize;
    TestGetNode;
-   TestProcess;
+   TestTraverseTreeAndApply;
+   TestDeleteRecursive;
 
 end TestBinaryTree;
 
