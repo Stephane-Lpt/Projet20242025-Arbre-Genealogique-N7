@@ -240,12 +240,16 @@ begin
 
    -- Test 1: Suppression d'un nœud feuille (clé 5)
    Put_Line("Test 1: Suppression d'un nœud feuille (clé 5)...");
-   --  deleteNodeRecursive(Tree1, 2);
+   Display_Tree (Tree1);
+   deleteNodeRecursive(Tree1, 5);
+   Display_Tree (Tree1);
    node := getNode (Tree1, 5);
-   pragma Assert(not isEmpty(node), "Test 1 échoué: Le nœud feuille (clé 5) est toujours présent.");
+   pragma Assert(isEmpty(node), "Test 1 échoué: Le nœud feuille (clé 5) est toujours présent.");
    -- TODO: Problem with deleteNodeRecursive
    if isEmpty(node) then
       Put_Line("Test 1 réussi: Le nœud feuille (clé 5) a été supprimé correctement.");
+   else 
+      Put_Line ("Test 1 échoué: Le nœud feuille (clé 5) est toujours présent.");
    end if;
 
    --  -- Test 2: Suppression d'un nœud avec un sous-arbre (clé 3)

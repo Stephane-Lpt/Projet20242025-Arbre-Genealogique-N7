@@ -48,8 +48,8 @@ package BinaryTree is
    -- Delete a node element and all his children
    procedure deleteNodeRecursive
      (ABR : in out T_BinaryTree; Key : in Integer) with
-     Pre => isPresent (ABR, Key); 
-   --    Post => getSize(ABR) = getSize (ABR)'Old - getSize(getNode(ABR, Key))'Old and not isPresent (ABR, Key);
+     Pre => isPresent (ABR, Key);
+   --    Post => isPresent (ABR, Key) = False;
 
    -- Delete all elements in Tree
    procedure clean (ABR : in out T_BinaryTree) with
@@ -64,6 +64,9 @@ package BinaryTree is
                               ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Stop : in out Boolean; Result: in out T_BinaryTree); 
                               Stop : in out  Boolean;
                               Result: in out T_BinaryTree);
+
+   procedure Display_Tree (ABR: in T_BinaryTree; Depth: Integer := 0);
+
 
   function getKey (ABR : T_BinaryTree) return Integer;
 
