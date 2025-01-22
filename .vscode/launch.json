@@ -11,8 +11,8 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
+            // "MIMode": "gdb",
+            // "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "Build test_binary_tree",
             "setupCommands": [
                 {

@@ -170,8 +170,8 @@ package body BinaryTree is
          else
             PutGeneric(ABR.all.Element, ABR.all.Key, Depth, Position, Verbosity);
          end if;
-         showTree(ABR.all.Right, PropToShow, Depth + 1, RIGHT);
-         showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT);
+         showTree(ABR.all.Right, PropToShow, Depth + 1, RIGHT, Verbosity);
+         showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT, Verbosity);
       end if;
    end showTree;
 

@@ -7,7 +7,6 @@ generic
 package BinaryTree is
 
    type T_BinaryTree is private;
-   type T_PropToShow is (Keys, Elements);
 
    Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
    Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR

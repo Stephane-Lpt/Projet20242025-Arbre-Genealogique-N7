@@ -14,3 +14,7 @@ nikita*
 
 obj/
 bin/
+
+.vscode/
+launch.json
+tasks.json

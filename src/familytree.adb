@@ -4,12 +4,28 @@ with utils;               use utils;
 
 package body FamilyTree is
 
+   procedure initFamilyTree(ABR : out T_FamilyTree) is
+   begin
+      initTree(ABR);
+   end initFamilyTree;
+
    -- 1. Créer un arbre minimal contenant le seul nœud racine, sans père ni mère.
-   procedure initializeFamilyTree
-     (ABR : out T_BinaryTree; Person : in T_Person) is
+   procedure initChild(ABR : out T_BinaryTree; Key: in Integer; Person : in T_Person) is
+   begin
+      initRoot (ABR, Key, Person);
+   end initChild;
+
+   procedure addAncestor (ABR : in out T_FamilyTree; TargetKey : in Integer; Position : in T_Position; NewKey : in Integer; NewPerson: in T_Person) is
+      NewNode : T_BinaryTree;
+   begin
+      initRoot(NewNode, NewKey, NewPerson);
+      addNode (ABR, NewNode, TargetKey, Position);
+   end addAncestor;
+
+   procedure deleteAncestor (ABR : in out T_FamilyTree; TargetKey : in Integer) is
    begin
       Null;
-   end initializeFamilyTree;
+   end deleteAncestor;
 
    -- Renvoie le nombre de générations dans un arbre donné
    function getGenerationsCount (ABR : in T_BinaryTree) return Integer is
@@ -31,11 +47,17 @@ package body FamilyTree is
       return Ancestors;
    end getAncestorsByGeneration;
 
-   -- 5. Afficher l’arbre à partir d’un nœud donné.
-   procedure showFamilyTree (ABR : in T_BinaryTree; Key : in Integer) is
+   -- Afficher l’arbre.
+   procedure showFamilyTree (ABR : in T_BinaryTree; Verbosity : in Integer := 1) is
    begin
-      Null;
+      showTree (ABR => ABR, PropToShow => Elements, Verbosity => Verbosity);
    end showFamilyTree;
+
+   -- 5. Afficher l’arbre à partir d’un nœud donné.
+   procedure showFamilyTreeFromId (ABR : in T_BinaryTree; Key : in Integer; Verbosity : in Integer := 1) is
+   begin
+      showFamilyTree (ABR => getNode(ABR, Key), Verbosity => Verbosity);
+   end showFamilyTreeFromId;
 
    -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector is
