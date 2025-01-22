@@ -11,6 +11,18 @@ package body utils is
       return Indent;
    end getIndent;
    
+   -- TODO : refactor bcs there's a way to do it differently & easier?
+   function getEmptyString(Length : in Integer) return String is
+      Indent : String(1..Length);
+   begin
+      for i in 1..Length loop
+         Indent(i) := ' ';
+      end loop;
+      
+      return Indent;
+   end getEmptyString;
+
+   
    function getBinaryTreePrefix(Position : in T_Position) return String is
    begin
       case Position is

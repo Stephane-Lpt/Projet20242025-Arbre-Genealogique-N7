@@ -120,7 +120,7 @@ package body BinaryTree is
          if PropToShow = Keys then
             Put_Line(getIndent(Depth) & getBinaryTreePrefix(Position) & Integer'Image(ABR.all.Key));
          else
-            Put_Generic(ABR.all.Element, ABR.all.Key, Depth, Position, Verbosity);
+            PutGeneric(ABR.all.Element, ABR.all.Key, Depth, Position, Verbosity);
          end if;
          showTree(ABR.all.Right, PropToShow, Depth + 1, RIGHT);
          showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT);

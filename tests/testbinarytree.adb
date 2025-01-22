@@ -3,14 +3,14 @@ with Utils; use Utils;
 with BinaryTree;
 
 procedure TestBinaryTree is
-    procedure PutInteger (Element : in Integer; Key : in Integer; Depth : in Integer := 0; Position : in T_Position := ROOT) is
+    procedure PutInteger (Element : in Integer; Key : in Integer; Depth : in Integer := 0; Position : in T_Position := ROOT; Verbosity : in Integer := 1) is
     begin
       Put_Line(getIndent(Depth) & getBinaryTreePrefix(Position) & Integer'Image(Key) & ":" & Integer'Image(Element));
    end PutInteger;
 
    package IntegerBinaryTree is new BinaryTree
      (
-      Put_Generic => PutInteger,
+      PutGeneric => PutInteger,
       T_Element   => Integer
      );
    use IntegerBinaryTree;
