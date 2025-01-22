@@ -108,7 +108,7 @@ package body BinaryTree is
       -- Procédure pour supprimer tous les nœuds descendants d'un nœud
       procedure deleteSubTree (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean) is
       begin
-         
+
          -- Si l'arbre est vide ou si le parcours doit être arrêté, rien à faire
          if ABR = null or else Stop then
             return;
@@ -147,7 +147,7 @@ package body BinaryTree is
       if isPresent (ABR, Key) = False then
          raise Absent_Key_Exception; -- La clé n'est pas présente dans l'arbre
       end if;
-      
+
       initTree (ABRParent);
       -- Initialiser le parent à null car il n'y a pas de parent au niveau de la racine
       traverseTreeAndApply(ABR, ABRParent, deleteSubTree'Access, Stop_Flag);
@@ -162,22 +162,22 @@ package body BinaryTree is
       Null;
    end clean;
 
-   procedure showTree (ABR : in T_BinaryTree; PropToShow : in T_PropToShow := Keys; Depth : in Integer := 0; Position : in T_Position := ROOT) is
+   procedure showTree (ABR : in T_BinaryTree; PropToShow : in T_PropToShow := Keys; Depth : in Integer := 0; Position : in T_Position := ROOT; Verbosity : in Integer := 1) is
    begin
       if not isEmpty (ABR) then
          if PropToShow = Keys then
             Put_Line(getIndent(Depth) & getBinaryTreePrefix(Position) & Integer'Image(ABR.all.Key));
          else
-            Put_Generic(ABR.all.Element, ABR.all.Key, Depth, Position);
+            PutGeneric(ABR.all.Element, ABR.all.Key, Depth, Position, Verbosity);
          end if;
          showTree(ABR.all.Right, PropToShow, Depth + 1, RIGHT);
          showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT);
       end if;
    end showTree;
 
-   procedure traverseTreeAndApply (ABR : in out T_BinaryTree; 
+   procedure traverseTreeAndApply (ABR : in out T_BinaryTree;
                               Parent : in out T_BinaryTree;
-                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean); 
+                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean);
                               Stop : in out Boolean) is
    begin
       -- Si l'arbre est vide ou si le flag Stop est à True, on arrête immédiatement
@@ -227,11 +227,11 @@ package body BinaryTree is
 
    procedure setRightChild(ABR : in out T_BinaryTree; Child : T_BinaryTree) is
    begin
-      ABR.Right := Child; 
+      ABR.Right := Child;
    end setRightChild;
 
 
-   
+
 
 
 end BinaryTree;

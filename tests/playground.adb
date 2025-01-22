@@ -58,4 +58,6 @@ begin
     -- TESTS --
     -- isEmpty function --
     pragma Assert (isEmpty (EmptyTree));
+
+    
 end playground;

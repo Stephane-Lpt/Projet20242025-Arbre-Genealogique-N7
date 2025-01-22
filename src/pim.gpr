@@ -3,7 +3,7 @@ project pim is
     -- ICI ON DOIT METTRE TOUS LES FICHIERS .adb MAIN (pas de .ads et de .adb qui implementent les .ads)
     -- EXEMPLE : for Main use ("exemple_integer_io.adb", "parenthesage.adb", "test_piles.adb", "utiliser_piles.adb");
     -- SANS INCLURE "piles.ads", "piles.adb"...
-    for Main use ("testbinarytree.adb", "playground.adb");
+    for Main use ("testbinarytree.adb", "playground.adb", "testperson.adb", "testfamilytree.adb");
 
     for Object_Dir use "../build/obj";  -- Directory for compiled object and ALI files
     for Exec_Dir   use "../build/bin"; -- Directory for executables

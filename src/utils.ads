@@ -4,6 +4,8 @@ package utils is
    -- Get indentation string based on the given depth
    function getIndent(Depth : in Integer) return String;
    
+   function getEmptyString(Length : in Integer) return String;
+   
    -- Get correct prefix character depending on the position in the tree
    function getBinaryTreePrefix(Position : in T_Position) return String;
 
