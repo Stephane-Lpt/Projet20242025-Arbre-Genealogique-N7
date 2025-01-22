@@ -10,6 +10,7 @@ package BinaryTree is
 
    Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
    Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
+   Wrong_Position_Exception : exception;   -- une position mauvaise a été saisie
 
    -- Initialize empty tree
    procedure initTree (ABR : out T_BinaryTree) with

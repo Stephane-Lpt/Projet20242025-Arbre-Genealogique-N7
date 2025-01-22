@@ -43,13 +43,13 @@ package body FamilyTree is
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
    function getAncestorsByGeneration (ABR : in T_BinaryTree; 
                                    Key : in Integer; 
-                                   Generation : in Integer) return TreeVector is
+                                   Generation : in Integer) return TreeVector.Vector is
    -- A vector to store the ancestors at the specified generation
-   Ancestors : TreeVector := (others => null);
+   Ancestors : TreeVector.Vector := TreeVector.Empty_Vector;
    Stop : Boolean := False;
    
    -- Find the node with the given Key
-   NodeToFind : T_BinaryTree := getNode(ABR, Key);
+   NodeToFind : T_FamilyTree := getNode(ABR, Key);
 
    -- A helper procedure to process each ancestor during the traversal
    procedure processAncestor (ABR : in out T_BinaryTree; 
@@ -57,14 +57,14 @@ package body FamilyTree is
                               Stop : in out Boolean) is
       GenLevel : Integer := 0;
       begin
-         if ABR = null or else Stop then
+         if isEmpty(ABR) or else Stop then
             return;
          end if;
 
          -- If we are at the target generation level, add the ancestor to the vector
          if GenLevel = Generation then
             -- Add ABR to Ancestors (you may need to define how TreeVector works)
-            Ancestors := Ancestors & (ABR);
+            Ancestors.append(ABR);
             Stop := True;  -- Stop further traversal after finding the generation
          end if;
 
@@ -77,7 +77,7 @@ package body FamilyTree is
 
    begin
       -- Check if the node to find exists
-      if NodeToFind = null then
+      if isEmpty(NodeToFind) then
          return Ancestors;  -- Return empty vector if node not found
       end if;
 
@@ -114,6 +114,23 @@ package body FamilyTree is
    end getDualParentIndividuals;
 
    -- Getters
-   function 
+   --function 
+   
+   function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree is
+   begin
+      case Position is
+         when ROOT =>
+            raise Wrong_Position_Exception;
+         when LEFT =>
+            return getLeftChild (ABR);
+         when RIGHT =>
+            return getLeftChild (ABR);
+      end case;
+   end getParent;
+
+   function getFamilyNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree is
+   begin
+      return getNode(ABR, Key);
+   end getFamilyNode;
 
 end FamilyTree;

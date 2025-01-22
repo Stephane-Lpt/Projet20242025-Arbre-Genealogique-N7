@@ -5,8 +5,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with FamilyTree; use FamilyTree;
 
 procedure TestPerson is
-   Person1, Person2, Person3, Person4 : T_Person;
-
    FamilyTree : T_FamilyTree;
 begin
    initChild (FamilyTree, 1, initPersonObj(

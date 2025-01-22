@@ -47,7 +47,6 @@ package FamilyTree is
    procedure showFamilyTree(ABR : in T_FamilyTree; Verbosity : in Integer := 1);
    procedure showFamilyTreeFromId (ABR : in T_BinaryTree; Key : in Integer; Verbosity : in Integer := 1);
 
-
    -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals
      (ABR : in T_FamilyTree; Key : in Integer) return TreeVector.Vector;
@@ -55,5 +54,9 @@ package FamilyTree is
    -- 8. Obtenir l’ensemble des individus dont les deux parents sont connus.
    function getDualParentIndividuals
      (ABR : in T_FamilyTree; Key : in Integer) return TreeVector.Vector;
+
+   function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree;
+
+   function getFamilyNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree;
 
 end FamilyTree;
