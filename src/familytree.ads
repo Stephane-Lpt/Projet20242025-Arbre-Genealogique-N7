@@ -12,36 +12,38 @@ package FamilyTree is
      );
    use Tree;
 
+   subtype T_FamilyTree is T_BinaryTree;
+
    -- TREE CHAINED LIST
-   package TreeVector is new Ada.Containers.Vectors (Index_Type => Natural, Element_Type => T_BinaryTree);
+   package TreeVector is new Ada.Containers.Vectors (Index_Type => Natural, Element_Type => T_FamilyTree);
 
    -- 1. Créer un arbre minimal contenant le seul nœud racine, sans père ni mère.
    procedure initializeFamilyTree
-     (ABR : out T_BinaryTree; Person : in T_Person) with
+     (ABR : out T_FamilyTree; Person : in T_Person) with
      Post =>
       getGenerationsCount (ABR) = 0; -- SHOULD HAVE ONE SINGLE GENERATION
 
    -- Renvoie le nombre de générations dans un arbre donné
-   function getGenerationsCount (ABR : in T_BinaryTree) return Integer;
+   function getGenerationsCount (ABR : in T_FamilyTree) return Integer;
 
    -- 3. Obtenir le nombre d’ancêtres connus (lui compris) d’un individu donné
    function getAncestorsCount
-     (ABR : in T_BinaryTree; Key : in Integer) return Integer;
+     (ABR : in T_FamilyTree; Key : in Integer) return Integer;
 
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
    function getAncestorsByGeneration
-     (ABR : in T_BinaryTree; Key : in Integer; Generation : in Integer)
+     (ABR : in T_FamilyTree; Key : in Integer; Generation : in Integer)
       return TreeVector.Vector;
 
    -- 5. Afficher l’arbre à partir d’un nœud donné.
-   procedure showFamilyTree (ABR : in T_BinaryTree; Key : in Integer);
+   procedure showFamilyTree (ABR : in T_FamilyTree; Key : in Integer);
 
    -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals
-     (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector;
+     (ABR : in T_FamilyTree; Key : in Integer) return TreeVector.Vector;
 
    -- 8. Obtenir l’ensemble des individus dont les deux parents sont connus.
    function getDualParentIndividuals
-     (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector;
+     (ABR : in T_FamilyTree; Key : in Integer) return TreeVector.Vector;
 
 end FamilyTree;

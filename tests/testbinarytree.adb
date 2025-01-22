@@ -1,6 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
+with FamilyTree;
 with Utils; use Utils;
-with BinaryTree;
+with BinaryTree; 
 
 procedure TestBinaryTree is
     procedure PutInteger (Element : in Integer; Key : in Integer; Depth : in Integer := 0; Position : in T_Position := ROOT; Verbosity : in Integer := 1) is
@@ -291,7 +292,6 @@ end TestDeleteRecursive;
 
 
 
-
 begin
     TestIsEmpty;
     --TestAddNode;
@@ -300,6 +300,5 @@ begin
    TestGetNode;
    TestTraverseTreeAndApply;
    TestDeleteRecursive;
-
 end TestBinaryTree;
 
