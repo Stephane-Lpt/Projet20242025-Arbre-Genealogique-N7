@@ -55,7 +55,7 @@ package BinaryTree is
      Post => isEmpty (ABR);
 
    -- Show binary tree (parcours infixe)
-   procedure showTree (ABR : in T_BinaryTree; PropToShow : T_PropToShow := Keys; Depth : Integer := 0; Position : T_Position := ROOT);
+   procedure showTree (ABR : in T_BinaryTree; PropToShow : T_PropToShow := Keys; Depth : Integer := 0; Position : T_Position := ROOT; Verbosity : in Integer := 1);
 
   -- Parcours récursif de l'arbre et application d'une fonction donnée en argument sur chaque noeud du tableau 
   -- jusqu'à ce que la fonction de callback renvoie Stop = True
