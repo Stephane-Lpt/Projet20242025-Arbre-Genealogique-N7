@@ -9,8 +9,8 @@ package BinaryTree is
    type T_BinaryTree is private;
    type T_PropToShow is (Keys, Elements);
 
-   --Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
-   --Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
+   Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
+   Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
 
    -- Initialize empty tree
    procedure initTree (ABR : out T_BinaryTree) with
@@ -48,7 +48,6 @@ package BinaryTree is
    -- Delete a node element and all his children
    procedure deleteNodeRecursive
      (ABR : in out T_BinaryTree; Key : in Integer) with
-     Pre => isPresent (ABR, Key), 
      Post => getSize(ABR) = getSize (ABR)'Old - getSize(getNode(ABR, Key))'Old and not isPresent (ABR, Key);
 
    -- Delete all elements in Tree
@@ -61,10 +60,18 @@ package BinaryTree is
   -- Parcours récursif de l'arbre et application d'une fonction donnée en argument sur chaque noeud du tableau 
   -- jusqu'à ce que la fonction de callback renvoie Stop = True
    procedure traverseTreeAndApply (ABR : in out T_BinaryTree; 
-                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Stop : in out Boolean); 
+                              Parent: in out T_BinaryTree;
+                              ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean); 
                               Stop : in out  Boolean);
 
-  function Get_Key (Tree : T_BinaryTree) return Integer;
+  function getKey (ABR : T_BinaryTree) return Integer;
+
+  function getLeftChild (ABR : T_BinaryTree) return T_BinaryTree;
+  procedure setLeftChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
+
+  function getRightChild (ABR : T_BinaryTree) return T_BinaryTree;
+  procedure setRightChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
+
      
 private
    
@@ -77,5 +84,6 @@ private
       Left : T_BinaryTree;
       Right  : T_BinaryTree;
    end record;
+   
 
 end BinaryTree;
