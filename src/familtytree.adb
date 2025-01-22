@@ -26,7 +26,7 @@ package body FamilyTree is
    end getAncestorsCount;
 
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
-   function getAncestorsByGeneration (ABR : in T_BinaryTree; Key : in Integer; Generation : in Integer) return NodeVector is
+   function getAncestorsByGeneration (ABR : in T_BinaryTree; Key : in Integer; Generation : in Integer) return TreeVector is
    begin
       Null;
    end getAncestorsByGeneration;
@@ -38,13 +38,13 @@ package body FamilyTree is
    end showFamilyTree;
 
    -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
-   function getSingleParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return PersonVector is
+   function getSingleParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector is
    begin
       Null;
    end getSingleParentIndividuals;
 
    -- 8. Obtenir l’ensemble des individus dont les deux parents sont connus.
-   function getDualParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return PersonVector is
+   function getDualParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector is
    begin
       Null;
    end getDualParentIndividuals;
