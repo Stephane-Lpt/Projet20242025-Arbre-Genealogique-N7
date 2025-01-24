@@ -456,12 +456,16 @@ procedure Menu is
                 HandleCreateNewPerson;
 
                 if not QUIT_FLAG_CREATE_PERSON then
-                    CurrentTree := ExistingTrees.Element(Index => Integer(ExistingTrees.Length) - 1);
-                    Tree := CurrentTree.Tree;
+                    CurrentTree := ExistingTrees.Element(Index => ExistingTrees.Last_Index);
+                    declare
+                        Tree: T_FamilyTree renames CurrentTree.Tree;
+                    begin
                     initChild (Tree, NewPersonKey, NewPerson);
+                    ExistingTrees.Replace_Element(ExistingTrees.Last_Index, CurrentTree);
                     showFamilyTree (Tree);
                     New_Line;
                     Put_Line(getColoredString("L'arbre " & To_String(CurrentTree.Name) & " a été crée.", SUCCESS));
+                    end;
                 end if;
             else
                 Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée'.", WARNING));
@@ -572,7 +576,7 @@ begin
     
     Put_Line(Integer(ExistingTrees.Length)'Image);
 
-    while ExitMainMenu loop
+    while not ExitMainMenu loop
         if ShowMainMenu then
             New_Line;
             Put_Line ("--- Menu principal ---");
