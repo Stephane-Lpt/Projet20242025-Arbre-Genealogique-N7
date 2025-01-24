@@ -5,14 +5,14 @@
             "name": "test_binary_tree",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/testbinarytree",
+            "program": "${workspaceFolder}/build/bin/testfamilytree",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
+            // "MIMode": "gdb",
+            // "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "Build test_binary_tree",
             "setupCommands": [
                 {

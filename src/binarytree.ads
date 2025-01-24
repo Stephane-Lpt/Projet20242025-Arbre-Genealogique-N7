@@ -7,10 +7,10 @@ generic
 package BinaryTree is
 
    type T_BinaryTree is private;
-   type T_PropToShow is (Keys, Elements);
 
    Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
    Absent_Key_Exception  : exception;      -- une clé est absente d'un ABR
+   Wrong_Position_Exception : exception;   -- une position mauvaise a été saisie
 
    -- Initialize empty tree
    procedure initTree (ABR : out T_BinaryTree) with
@@ -64,13 +64,15 @@ package BinaryTree is
                               ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean); 
                               Stop : in out  Boolean);
 
-  function getKey (ABR : T_BinaryTree) return Integer;
+   function getKey (ABR : T_BinaryTree) return Integer;
 
-  function getLeftChild (ABR : T_BinaryTree) return T_BinaryTree;
-  procedure setLeftChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
+   function getLeftChild (ABR : T_BinaryTree) return T_BinaryTree;
+   procedure setLeftChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
 
-  function getRightChild (ABR : T_BinaryTree) return T_BinaryTree;
-  procedure setRightChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
+   function getRightChild (ABR : T_BinaryTree) return T_BinaryTree;
+   procedure setRightChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
+
+   function getElement (ABR : T_BinaryTree) return T_Element;
 
      
 private

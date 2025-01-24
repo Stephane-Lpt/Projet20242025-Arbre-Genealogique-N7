@@ -3,6 +3,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 
 package body Person is
+
    function initPersonObj(
                           FirstName : in Unbounded_String := To_Unbounded_String(""); 
                           LastName : in Unbounded_String := To_Unbounded_String("");
@@ -26,13 +27,17 @@ package body Person is
    procedure showPerson(Person : in T_Person; Key : in Integer; Depth : in Integer := 0; Position : in T_Position := ROOT; Verbosity : in Integer := 1) is
       BinaryTreePrefix : String := getBinaryTreePrefix (Position);
       Indent : String := getIndent (Depth);
-      ParentString : Unbounded_String := To_Unbounded_String(if Position = ROOT then "Enfant" else (if Position = LEFT then "Parent 1" else "Parent 2"));
-      ExtraIndentation : Unbounded_String := To_Unbounded_String((Length(Indent & ParentString)));
-      UnknownValue : constant String := "Inconnu";
+      ParentString : Unbounded_String := To_Unbounded_String(getBinaryTreePrefix(Position) & " " & (if Position = ROOT then "Enfant" else (if Position = LEFT then "Parent 2" else "Parent 1")));
+      UnknownValue : constant Unbounded_String := To_Unbounded_String("Inconnu");
+      EmptyString : constant Unbounded_String := To_Unbounded_String("");
+      
+      PropFirstName : constant Unbounded_String := To_Unbounded_String("Pr�nom");
+      PropLastName : constant Unbounded_String := To_Unbounded_String("Nom de famille");
+      PropGender : constant Unbounded_String := To_Unbounded_String("Sexe");
+      PropBirthdate : constant Unbounded_String := To_Unbounded_String("Date d'anniversaire");
 
       function getFormattedString (PropName : in Unbounded_String; PropValue : in Unbounded_String; PutUnknownValues : in Boolean := False) return String is
          FormattedString : Unbounded_String := Indent & PropName & ": ";
-         EmptyString : constant Unbounded_String := To_Unbounded_String("");
       begin
          if PropValue = EmptyString and PutUnknownValues then
             FormattedString := FormattedString & UnknownValue & Character'Val(10);
@@ -51,32 +56,34 @@ package body Person is
          when 2 =>
             declare
                NameString : Unbounded_String;
-               EmptyString : Unbounded_String := To_Unbounded_String ("");
+               EmptyString : constant Unbounded_String := To_Unbounded_String ("");
             begin
                if Person.FirstName /= EmptyString and Person.LastName = EmptyString then
                   NameString := Person.FirstName;
                elsif Person.FirstName = EmptyString and Person.LastName /= EmptyString then
                   NameString := Person.LastName;
                elsif Person.FirstName /= EmptyString and Person.LastName /= EmptyString then
-                  NameString := Person.LastName & " " & Person.LastName;
+                  NameString := Person.FirstName & " " & Person.LastName;
                else
-                  NameString := EmptyString;
+                  NameString := UnknownValue;
                end if;
                
                Put (getFormattedString(ParentString, NameString));
             end;
          when 3 => 
             Put (getFormattedString(ParentString, To_Unbounded_String(Integer'Image(Key))));
-            Put (getFormattedString(ExtraIndentation, Person.FirstName));
-            Put (getFormattedString(ExtraIndentation, Person.LastName));
-            Put (getFormattedString(ExtraIndentation, Person.Gender));
-            Put (getFormattedString(ExtraIndentation, Person.Birthdate));
+            Put (getFormattedString(PropFirstName, Person.FirstName));
+            Put (getFormattedString(PropLastName, Person.LastName));
+            Put (getFormattedString(PropGender, Person.Gender));
+            Put (getFormattedString(PropBirthdate, Person.Birthdate));
+            New_Line;
          when 4 => 
             Put (getFormattedString(ParentString, To_Unbounded_String(Integer'Image(Key)), True));
-            Put (getFormattedString(ExtraIndentation, Person.FirstName, True));
-            Put (getFormattedString(ExtraIndentation, Person.LastName, True));
-            Put (getFormattedString(ExtraIndentation, Person.Gender, True));
-            Put (getFormattedString(ExtraIndentation, Person.Birthdate, True));
+            Put (getFormattedString(PropFirstName, Person.FirstName, True));
+            Put (getFormattedString(PropLastName, Person.LastName, True));
+            Put (getFormattedString(PropGender, Person.Gender, True));
+            Put (getFormattedString(PropBirthdate, Person.Birthdate, True));
+            New_Line;
          when others =>
             Null;
       end case;

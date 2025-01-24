@@ -156,10 +156,13 @@ package body BinaryTree is
 
 
 
-   -- TODO
+   -- Nettoie l'arbre en supprimant tous les noeuds et ainsi libérant la mémoire
    procedure clean (ABR : in out T_BinaryTree) is
    begin
-      Null;
+      if not isEmpty(ABR) then
+         deleteNodeRecursive(ABR, ABR.Key); -- Supprime récursivement à partir de la racine
+         ABR := null;
+      end if;
    end clean;
 
    procedure showTree (ABR : in T_BinaryTree; PropToShow : in T_PropToShow := Keys; Depth : in Integer := 0; Position : in T_Position := ROOT; Verbosity : in Integer := 1) is
@@ -170,8 +173,8 @@ package body BinaryTree is
          else
             PutGeneric(ABR.all.Element, ABR.all.Key, Depth, Position, Verbosity);
          end if;
-         showTree(ABR.all.Right, PropToShow, Depth + 1, RIGHT);
-         showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT);
+         showTree(ABR.all.Right, PropToShow, Depth + 1, RIGHT, Verbosity);
+         showTree(ABR.all.Left, PropToShow, Depth + 1, LEFT, Verbosity);
       end if;
    end showTree;
 
@@ -229,6 +232,11 @@ package body BinaryTree is
    begin
       ABR.Right := Child;
    end setRightChild;
+
+   function getElement (ABR : T_BinaryTree) return T_Element is
+   begin
+      return ABR.Element;
+   end getElement;
 
 
 
