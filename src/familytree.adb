@@ -39,11 +39,7 @@ package body FamilyTree is
    is
       Node : constant T_FamilyTree := getFamilyNode(ABR, Key);
    begin
-      if IsNull(Node) then
-         return 0;
-      else
-         return getSize(Node); -- Utilise la fonction getSize existante du BinaryTree
-      end if;
+      return getSize(Node); -- Utilise la fonction getSize existante du BinaryTree
    end getAncestorsCount;
 
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
