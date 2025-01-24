@@ -37,31 +37,20 @@ procedure Menu is
     package TreeVector is new Ada.Containers.Vectors
      (Index_Type => Natural, Element_Type => TreeTuple);
     use TreeVector;
+
     ExistingTrees  : TreeVector.Vector;
     CurrentTree    : TreeTuple;
     Verbosity      : Integer := 1;
-    ExitMainMenu   : Boolean := False;
-    MainMenuChoice : Integer := 0;
-    ShowMainMenu   : Boolean := True;
-    QuitCharacter  : Unbounded_String := To_Unbounded_String ("q");
+    QuitCharacter  : constant Unbounded_String := To_Unbounded_String ("q");
 
     type String_Access is Access all Unbounded_String;
     type Boolean_Access is Access all Boolean;
     type Person_Access is Access all T_Person;
 
-    ExitCreateNewPersonMenu : aliased Boolean := False;
-    ExitCreateNewTreeMenu : aliased Boolean := False;
-    
-    FirstName : aliased Unbounded_String;
-    LastName : aliased Unbounded_String;
-    Gender : aliased Unbounded_String;
-    Birthdate : aliased Unbounded_String;
-
-    NewPerson : aliased T_Person;
-    NewPersonKey : aliased Integer;
-    NewTreeName : aliased Unbounded_String;
-
     QUIT_FLAG_CREATE_PERSON :  Boolean := False;
+    
+    MainMenuChoice : aliased Unbounded_String;
+    ExitMainMenu : aliased Boolean := False;
 
     procedure TreeMenu is
         procedure HandleAddAncestor is
@@ -109,22 +98,10 @@ procedure Menu is
             null;
         end HandleGetDualParentIndividuals;
 
-        procedure HandleCleanTree is
-        begin
-            null;
-        end HandleCleanTree;
-
         Choice : Integer;
         ExitTreeMenu : Boolean := False;
-        ChosenTree : T_FamilyTree;
 
     begin
-        Put_Line("check");
-        ChosenTree := CurrentTree.Tree;
-        showFamilyTree (ChosenTree, 4);
-        New_Line;
-        Put_Line("vector length: " & Integer(ExistingTrees.Length)'Image);
-        Put_Line("check");
         while not ExitTreeMenu loop
             New_Line;
             Put_Line ("--- Gestion de l'arbre " & To_String(CurrentTree.Name) & " ---");
@@ -140,7 +117,6 @@ procedure Menu is
             Put_Line ("8. Obtenir les individus sans parents connus");
             Put_Line ("9. Obtenir les individus avec un seul parent connu");
             Put_Line ("10. Obtenir les individus avec deux parents");
-            Put_Line ("11. Retourner au menu principal");
 
             New_Line;
             Put ("Entrez votre choix (1-11) : ");
@@ -165,8 +141,6 @@ procedure Menu is
                     HandleGetSingleParentIndividuals;
                 when 9 =>
                     HandleGetDualParentIndividuals;
-                when 10 =>
-                    HandleCleanTree;
                 when 11 =>
                     ExitTreeMenu := True;
                 when others =>
@@ -175,33 +149,54 @@ procedure Menu is
         end loop;
 
     end TreeMenu;
-
-    procedure HandleInput(Pointer : in String_Access; Stop : in Boolean_Access; TextString : in String) is
+    
+    procedure HandleInput(Pointer : in String_Access; Stop : in Boolean_Access; TextString : in String; InputType : in T_InputType := STR; MaxInt : in Integer := -1) is
+        -- GET IMPUT FROM USER
+        -- Pointer : pointer to the string that is going to be modified
+        -- Stop : pointer to the stop flag (in case of 'q')
+        -- TextString : Input prompt string 
         ExitInput : Boolean := False;
+        ShowTextString : Boolean := True;
         Input : Unbounded_String;
+        TempInt : Integer;
     begin
         while not ExitInput loop
             begin
-                Put (TextString);
+                if ShowTextString then
+                    Put (TextString);
+                end if;
+
                 Input := To_Unbounded_String(Get_Line);
 
                 if Input = QuitCharacter then
                     ExitInput := True;
                     Stop.all := True;
                 else
+                    if InputType = INT then
+                        --  IN CASE WHEN ASKED FOR AN INTEGER, CHECKING IF IT'S A VALID INT
+                        TempInt := Integer'Value(To_String(Input));
+                    end if;
+
+                    -- ALSO CHECKING IF IT FALLS IN THE 1 .. MaxInt RANGE (only if MaxInt isn't the default value, -1)
+                    if MaxInt /= -1 and (TempInt <= 0 or TempInt > MaxInt) then
+                        raise Data_Error;
+                    end if;
+
                     Pointer.all := Input;
                     ExitInput := True;
                 end if;
             exception
-                when Data_Error =>
-                    Skip_Line;
+                when Data_Error | Constraint_Error =>
+                    -- QUOICOUBEH;
                     New_Line;
                     Put(getColoredString("Saisie invalide, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ", ERROR));
+                    ShowTextString := False;
             end;
         end loop;
     end HandleInput;
 
-    function getKeyByInput(mustBePresent : in Boolean; checkPresence : in Boolean := True) return Integer is
+    function GetKeyByInput(mustBePresent : in Boolean; checkPresence : in Boolean := True) return Integer is
+        -- checkPresence to check if key is absent / present
         -- isPresent if the key is supposed to be present
         -- not isPresent if the key is supposed to be absent
         ExitGetKey : Boolean := False;
@@ -211,7 +206,7 @@ procedure Menu is
 
         procedure Handle_Exception(Message : in String) is
         begin
-            Skip_Line;
+            -- QUOICOUBEH;
             New_Line;
             Put(getColoredString(Message, ERROR));
             ShowGetKeyMenu := False;
@@ -222,6 +217,7 @@ procedure Menu is
                 if ShowGetKeyMenu then
                     Put ("Entrez la clé: ");
                 end if;
+                
                 Key := To_Unbounded_String(Get_Line);
 
                 if not (Key = QuitCharacter) then
@@ -253,55 +249,18 @@ procedure Menu is
             end;
         end loop;
         return -1;
-    end getKeyByInput;
+    end GetKeyByInput;
 
-    function getExistingTreesLength return Integer is
+    function GetExistingTreesLength return Integer is
     begin
         return Integer(ExistingTrees.Length) + 1;
-    end getExistingTreesLength;
+    end GetExistingTreesLength;
 
     procedure AddDefaultTree is
         Tuple : TreeTuple;
-
-        function getExampleTree return T_FamilyTree is
-            FamilyTree : T_FamilyTree;
-        begin
-            initChild(FamilyTree, 1, Person.initPersonObj(
-                FirstName => To_Unbounded_String("Victor"),
-                LastName => To_Unbounded_String("Wembanyama"),
-                Gender => To_Unbounded_String("Male"),
-                Birthdate => To_Unbounded_String("04-01-2004")
-            ));
-            addAncestor(FamilyTree, 1, LEFT, 2, Person.initPersonObj(
-                FirstName => To_Unbounded_String("LeBron"),
-                LastName => To_Unbounded_String("James"),
-                Gender => To_Unbounded_String("Male"),
-                Birthdate => To_Unbounded_String("30-12-1984")
-            ));
-            addAncestor(FamilyTree, 1, RIGHT, 3, Person.initPersonObj(
-                FirstName => To_Unbounded_String("Lisa"),
-                LastName => To_Unbounded_String("Leslie"),
-                Gender => To_Unbounded_String("Female"),
-                Birthdate => To_Unbounded_String("07-07-1972")
-            ));
-            addAncestor(FamilyTree, 3, LEFT, 4, Person.initPersonObj(
-                FirstName => To_Unbounded_String("Kobe"),
-                LastName => To_Unbounded_String("Bryant"),
-                Gender => To_Unbounded_String("Male"),
-                Birthdate => To_Unbounded_String("23-08-1978")
-            ));
-            addAncestor(FamilyTree, 4, RIGHT, 5, Person.initPersonObj(
-                FirstName => To_Unbounded_String("Michael"),
-                LastName => To_Unbounded_String("Jordan"),
-                Gender => To_Unbounded_String("Male"),
-                Birthdate => To_Unbounded_String("17-02-1963")
-            ));
-
-            return FamilyTree;
-        end getExampleTree;
     begin
         Tuple.Name := To_Unbounded_String("Arbre exemple");
-        Tuple.Tree := getExampleTree;
+        Tuple.Tree := FamilyTree.GetExampleFamilyTree;
         ExistingTrees.Append (Tuple);
     end AddDefaultTree;
     
@@ -317,305 +276,184 @@ procedure Menu is
         Index : Integer := 1;
     begin
         for el of ExistingTrees loop
-            Put_Line (Index'Img & ". " & To_String(el.Name));
+            Put_Line (getTrimmedInt(Index) & ". " & To_String(el.Name));
             Index := Index + 1;
         end loop;
     end ShowExistingTrees;
 
-    procedure HandleCreateNewPerson(TargetKey : in Integer := 0; Position : in T_Position := ROOT) is
-        ShowCreateNewPersonMenu : Boolean := True;
-        ShowKeyText : Boolean := True;
+    ExitCreateNewPersonMenu : aliased Boolean := False;
+    NewPerson : aliased T_Person;
+    NewPersonKey : aliased Integer := 1;
+    FirstName : aliased Unbounded_String;
+    LastName : aliased Unbounded_String;
+    Gender : aliased Unbounded_String;
+    Birthdate : aliased Unbounded_String;
+    procedure HandleCreateNewPerson(Position : in T_Position := ROOT) is
     begin
-        ExitCreateNewPersonMenu := False;
-        FirstName := To_Unbounded_String("");
-        LastName := To_Unbounded_String("");
-        Gender := To_Unbounded_String("");
-        Birthdate := To_Unbounded_String("");
+        New_Line;
+        if Position = ROOT then
+            Put_Line ("--- Ajoute de l'enfant ---");
+        else
+            Put_Line ("--- Ajout d'un nouvel ancêtre ---");
+        end if;
+        New_Line;
 
-        while not ExitCreateNewPersonMenu loop
-            if ShowCreateNewPersonMenu then
+        --  NewPersonKey := GetKeyByInput(False, False);
+        NewPersonKey := NewPersonKey + 1;
+        --  if NewPersonKey = -1 then
+        --      ExitCreateNewPersonMenu := True;
+        --  end if;
+
+        HandleInput (Pointer => FirstName'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le prénom de la personne: ");
+        if not ExitCreateNewPersonMenu then HandleInput (Pointer => LastName'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le nom de la personne: "); end if;
+        if not ExitCreateNewPersonMenu then HandleInput (Pointer => Gender'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le sexe de la personne: "); end if;
+        if not ExitCreateNewPersonMenu then HandleInput (Pointer => Birthdate'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez la date d'anniversaire de la personne: "); end if;
+        
+        if not ExitCreateNewPersonMenu then
+            NewPerson := initPersonObj(
+                FirstName => FirstName, 
+                LastName => LastName, 
+                Gender => Gender, 
+                BirthDate => Birthdate
+            );
+
+            if Position /= ROOT then
                 New_Line;
-                if Position = ROOT then
-                    Put_Line ("--- Ajoute de l'enfant ---");
-                else
-                    Put_Line ("--- Ajout d'un nouvel ancêtre ---");
-                end if;
-                New_Line;
+                Put_Line(getColoredString("Un nouvel ancêtre a été ajoutée", SUCCESS));
             end if;
-            begin
-                NewPersonKey := getKeyByInput(False, False);
-                
-                if NewPersonKey = -1 then
-                    ExitCreateNewPersonMenu := True;
-                end if;
-
-                if not ExitCreateNewPersonMenu then
-                    if not ExitCreateNewPersonMenu then HandleInput (Pointer => FirstName'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le prénom de la personne: "); end if;
-                    if not ExitCreateNewPersonMenu then HandleInput (Pointer => LastName'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le nom de la personne: "); end if;
-                    if not ExitCreateNewPersonMenu then HandleInput (Pointer => Gender'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le sexe de la personne: "); end if;
-                    if not ExitCreateNewPersonMenu then HandleInput (Pointer => Birthdate'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez la date d'anniversaire de la personne: "); end if;
-                    
-                    if not ExitCreateNewPersonMenu then
-                        NewPerson := initPersonObj(
-                            FirstName => FirstName, 
-                            LastName => LastName, 
-                            Gender => Gender, 
-                            BirthDate => Birthdate
-                        );
-                    end if;
-                end if;
-
-                if ExitCreateNewPersonMenu then
-                    QUIT_FLAG_CREATE_PERSON := True;
-                    New_Line;
-                    if Position /= ROOT then
-                        Put_Line(getColoredString("Abandon de l'operation. L'ancêtre n'a pas été ajouté.", WARNING));
-                    else
-                        Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
-                    end if;
-                else 
-                    if Position /= ROOT then
-                        New_Line;
-                        Put_Line(getColoredString("Une nouvelle personne a été ajoutée", SUCCESS));
-                    end if;
-                end if;
-                ExitCreateNewPersonMenu := True;
-            exception
-                when Data_Error | Constraint_Error =>
-                    Skip_Line;
-                    New_Line;
-                    Put(getColoredString("Saisie invalide, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ", ERROR));
-                    ShowCreateNewPersonMenu := False;
-                    ShowKeyText := False;
-            end;
-        end loop;
-        ExitCreateNewPersonMenu := False;
+        else
+            QUIT_FLAG_CREATE_PERSON := True;
+            New_Line;
+            if Position /= ROOT then
+                Put_Line(getColoredString("Abandon de l'operation. L'ancêtre n'a pas été ajouté.", WARNING));
+            else
+                Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
+            end if;
+        end if;
     end HandleCreateNewPerson;
 
-    procedure HandleChooseTree(CurrentTree : in out TreeTuple) is
-        ExitChooseTreeMenu : Boolean := False;
-        ShowChooseTreeMenu : Boolean := True;
-        ChoicesIndex : String := "(1-" & Trim(getExistingTreesLength'Image, Ada.Strings.Left) & ")";
+    ExitTreeOperationMenu : aliased Boolean := False;
+    TreeOperationIndex : aliased Unbounded_String;
+    procedure HandleTreeOperation(Operation : in T_OperationType) is
+        TitleText : String := (if Operation = CHOOSE then "Choisir un arbre" else "Supprimer un arbre");
     begin
-        if getExistingTreesLength - 1 = 0 then
+        if GetExistingTreesLength - 1 > 0 then
             New_Line;
-            Put_Line(getColoredString("Aucun arbre à choisir. Veuillez d'abord créer un arbre.", WARNING));
-            ExitChooseTreeMenu := True;
+            Put_Line ("--- " & TitleText & " ---");
+            New_Line;
+            ShowExistingTrees;
+            Put_Line ("q. Retourner au menu principal");
+            New_Line;
+
+            TreeOperationIndex := To_Unbounded_String("-1");
+            HandleInput (Pointer => TreeOperationIndex'Access, Stop => ExitTreeOperationMenu'Access, TextString => "Entrez votre choix " & getMenuRangeString (GetExistingTreesLength) & ": ", InputType => INT, MaxInt => GetExistingTreesLength - 1);
+
+            if not ExitTreeOperationMenu then
+                if Operation = CHOOSE then
+                    CurrentTree := ExistingTrees.Element (Integer'Value(To_String(TreeOperationIndex)) - 1);
+
+                    New_Line;
+                    Put_Line(getColoredString("L'arbre '" & To_String(CurrentTree.Name) & "' a été choisi.", SUCCESS)); 
+                    TreeMenu;
+                elsif OPERATION = DELETE then
+                    --  TODO : delete memory from this tree ( stephane ? )
+
+                    New_Line;
+                    Put_Line(getColoredString("L'arbre '" & To_String(ExistingTrees.Element(Integer'Value(To_String(TreeOperationIndex)) - 1).Name) & "' a été supprimé.", SUCCESS));
+                    Delete(ExistingTrees, Integer'Value(To_String(TreeOperationIndex)) - 1);
+                end if;
+            end if;
+        else
+            New_Line;
+            Put_Line(getColoredString("Aucun arbre existant. Veuillez d'abord en créer un.", WARNING));
         end if;
+    end HandleTreeOperation;
 
-        while not ExitChooseTreeMenu loop
-            if ShowChooseTreeMenu then
-                New_Line;
-                Put_Line ("--- Choisir un arbre ---");
-                New_Line;
-                ShowExistingTrees;
-                Put_Line (getExistingTreesLength'Image & ". Retourner au menu principal");
-                New_Line;
-                Put ("Entrez votre choix " & ChoicesIndex & ": ");
-            end if;
-            declare
-                TreeToChooseIndex : Integer;
-            begin
-                Get (Item => TreeToChooseIndex);
-                if TreeToChooseIndex < 0 or TreeToChooseIndex > getExistingTreesLength then
-                    raise Data_Error;
-                else
-                    if not (TreeToChooseIndex = getExistingTreesLength) then
-                        CurrentTree := ExistingTrees.Element (TreeToChooseIndex - 1);
-                        New_Line;
-                        Put_Line(getColoredString("L'arbre '" & To_String(CurrentTree.Name) & "' a été choisi.", SUCCESS)); 
-                        TreeMenu;
-                        --  addAncestor (ABR => CurrentTree.Tree, TargetKey => 1, Position => LEFT, NewKey => 2, NewPerson => initPersonObj);
-                    end if;
-                end if;
-                ExitChooseTreeMenu := True;
-                ShowMainMenu := True;
-            exception
-                when Data_Error =>
-                    Skip_Line;
-                    New_Line;
-                    Put(getColoredString("Choix invalide, veuillez réessayer " & ChoicesIndex & ": ", ERROR));
-                    ShowChooseTreeMenu := False;
-            end;
-        end loop;
-    end HandleChooseTree;
-
-    procedure HandleCreateTree(CurrentTree : in out TreeTuple) is
-        Tree : T_FamilyTree;
+    ExitCreateNewTreeMenu : aliased Boolean := False;
+    NewTreeName : aliased Unbounded_String;
+    procedure HandleCreateTree is
+        Tree: T_FamilyTree renames CurrentTree.Tree;
     begin
-        ExitCreateNewTreeMenu := False;
-        while not ExitCreateNewTreeMenu loop
-            Skip_Line;
-            New_Line;
-            Put_Line ("--- Créer un arbre ---");
-            New_Line;
-            HandleInput (Pointer => NewTreeName'Access, Stop => ExitCreateNewTreeMenu'Access, TextString => "Entrez le nom de l'arbre à créer ('q' pour quitter): ");
+        New_Line;
+        Put_Line ("--- Créer un arbre ---");
+        New_Line;
 
-            if not ExitCreateNewTreeMenu then
-                AddNewTree (To_String(NewTreeName));
-                HandleCreateNewPerson;
+        HandleInput (Pointer => NewTreeName'Access, Stop => ExitCreateNewTreeMenu'Access, TextString => "Entrez le nom de l'arbre à créer ('q' pour quitter): ");
+        
+        if not ExitCreateNewTreeMenu then
+            AddNewTree (To_String(NewTreeName));
+            HandleCreateNewPerson;
 
-                if not QUIT_FLAG_CREATE_PERSON then
-                    CurrentTree := ExistingTrees.Element(Index => ExistingTrees.Last_Index);
-                    declare
-                        Tree: T_FamilyTree renames CurrentTree.Tree;
-                    begin
-                    initChild (Tree, NewPersonKey, NewPerson);
-                    ExistingTrees.Replace_Element(ExistingTrees.Last_Index, CurrentTree);
-                    showFamilyTree (Tree);
-                    New_Line;
-                    Put_Line(getColoredString("L'arbre " & To_String(CurrentTree.Name) & " a été crée.", SUCCESS));
-                    end;
-                end if;
-            else
-                Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée'.", WARNING));
+            if not QUIT_FLAG_CREATE_PERSON then
+                CurrentTree := ExistingTrees.Element(Index => ExistingTrees.Last_Index);
+                initChild (Tree, NewPersonKey, NewPerson);
+                ExistingTrees.Replace_Element(ExistingTrees.Last_Index, CurrentTree);
+                New_Line;
+                Put_Line(getColoredString("L'arbre " & To_String(CurrentTree.Name) & " a été crée.", SUCCESS));
             end if;
-
-            ExitCreateNewTreeMenu := True;
-        end loop;
+        else
+            New_Line;
+            Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
+        end if;
     end HandleCreateTree;
-
-    procedure HandleDeleteTree is
-        ExitDeleteTreeMenu : Boolean := False;
-        ShowDeleteTreeMenu : Boolean := True;
-        getExistingTreesLength : Integer := Integer(ExistingTrees.Length) + 1;
-        ChoicesIndex : String := "(1-" & Trim(getExistingTreesLength'Image, Ada.Strings.Left) & ")";
-    begin
-        if getExistingTreesLength - 1 = 0 then
-            New_Line;
-            Put_Line(getColoredString("Aucun arbre à supprimer. Veuillez d'abord créer un arbre.", WARNING));
-            ExitDeleteTreeMenu := True;
-        end if;
-
-        while not ExitDeleteTreeMenu loop
-            if ShowDeleteTreeMenu then
-                New_Line;
-                Put_Line ("--- Supprimer un arbre ---");
-                New_Line;
-                ShowExistingTrees;
-                Put_Line (getExistingTreesLength'Image & ". Retourner au menu principal");
-                New_Line;
-                Put ("Entrez votre choix " & ChoicesIndex & ": ");
-            end if;
-            declare
-                TreeToDeleteIndex : Integer;
-            begin
-                Get (Item => TreeToDeleteIndex);
-                if TreeToDeleteIndex < 0 or TreeToDeleteIndex > getExistingTreesLength then
-                    raise Data_Error;
-                else
-                    if not (TreeToDeleteIndex = getExistingTreesLength) then
-                        New_Line;
-                        Put_Line(getColoredString("L'arbre '" & To_String(ExistingTrees.Element(TreeToDeleteIndex - 1).Name) & "' a été supprimé.", SUCCESS)); 
-                        Delete(ExistingTrees, TreeToDeleteIndex - 1);
-                        -- TODO : delete memory from this tree ( stephane ? )
-                    end if;
-                end if;
-                ExitDeleteTreeMenu := True;
-                ShowMainMenu := True;
-            exception
-                when Data_Error =>
-                    Skip_Line;
-                    New_Line;
-                    Put(getColoredString("Choix invalide, veuillez réessayer " & ChoicesIndex & ": ", ERROR));
-                    ShowDeleteTreeMenu := False;
-            end;
-        end loop;
-    end HandleDeleteTree;
-
+	
+    NewVerbosity : aliased Unbounded_String;
+    ExitChangeVerbosityMenu : aliased Boolean := False;
     procedure HandleChangeVerbosity is
-        ExitChangeVerbosityMenu : Boolean := False;
-        ShowVerbositySettings : Boolean := True;
     begin
-        while not ExitChangeVerbosityMenu loop
-            if ShowVerbositySettings then
-                Put_Line ("--- Verbosité ---");
+        New_Line;
+        Put_Line ("--- Verbosité ---");
+        New_Line;
+        Put_Line("Verbosité actuellement définie:" & Integer'Image (Verbosity));
+        New_Line;
+        Put_Line ("1. Afficher 'rôle' : 'clé'");
+        Put_Line ("2. Afficher 'rôle' : 'nom et prénom'");
+        Put_Line ("3. Afficher toutes les informations connues");
+        Put_Line ("4. Afficher toutes les informations");
+        Put_Line ("q. Retourner au menu principal");
+        New_Line;
+
+	    NewVerbosity := To_Unbounded_String("-1");
+        HandleInput (Pointer => NewVerbosity'Access, Stop => ExitChangeVerbosityMenu'Access, TextString => "Entrez votre choix " & getMenuRangeString (4) & ": ", InputType => INT, MaxInt => 4);
+
+        if not ExitChangeVerbosityMenu then
+            if Integer'Value(To_String(NewVerbosity)) /= -1 then
+                Verbosity := Integer'Value(To_String(NewVerbosity));
                 New_Line;
-                Put_Line("Verbosité actuellement définie:" & Integer'Image (Verbosity));
-                New_Line;
-                Put_Line ("1. Afficher 'rôle' : 'clé'");
-                Put_Line ("2. Afficher 'rôle' : 'nom et prénom'");
-                Put_Line ("3. Afficher toutes les informations connues");
-                Put_Line ("4. Afficher toutes les informations");
-                Put_Line ("5. Retourner au menu principal");
-                New_Line;
-                Put ("Entrez votre choix (1-5): ");
+                Put_Line (getColoredString("La verbosité a été définie à" & Integer'Image(Verbosity), SUCCESS));
             end if;
-            declare
-                NewVerbosity : Integer;
-            begin
-                Get (Item => NewVerbosity);
-                if NewVerbosity /= 5 then
-                    Verbosity := NewVerbosity;
-                    New_Line;
-                    Put_Line (getColoredString("La verbosité a été définie à" & Integer'Image(Verbosity), SUCCESS));
-                end if;
-                ExitChangeVerbosityMenu := True;
-                ShowMainMenu := True;
-            exception
-                when Data_Error =>
-                    Skip_Line;
-                    New_Line;
-                    Put(getColoredString("Choix invalide, veuillez réessayer (1-5): ", ERROR));
-                    ShowVerbositySettings := False;
-            end;
-        end loop;
+        end if;
     end HandleChangeVerbosity;
 
 begin
-    Put_Line(Integer(ExistingTrees.Length)'Image);
     AddDefaultTree;
 
-    HandleCreateTree(CurrentTree);
-    
-    Put_Line(Integer(ExistingTrees.Length)'Image);
-
-    for el of ExistingTrees loop
-        showFamilyTree (el.Tree);
-    end loop;
-    
-    Put_Line(Integer(ExistingTrees.Length)'Image);
-
     while not ExitMainMenu loop
-        if ShowMainMenu then
-            New_Line;
-            Put_Line ("--- Menu principal ---");
-            New_Line;
-            Put_Line ("1. Choisir un arbre");
-            Put_Line ("2. Créer un arbre");
-            Put_Line ("3. Supprimer un arbre");
-            Put_Line ("4. Changer la verbosité (" & Trim(Verbosity'Image, Ada.Strings.Left) & " actuellement)");
-            Put_Line ("5. Quitter");
-            New_Line;
-            Put ("Entrez votre choix (1-5): ");
-        end if;
-        begin
-            Get (Item => MainMenuChoice);
-        exception
-            when Data_Error =>
-                Skip_Line;
-                MainMenuChoice := 0;
-                ShowMainMenu := False;
-        end;
+        New_Line;
+        Put_Line ("--- Menu principal ---");
+        New_Line;
+        Put_Line ("1. Choisir un arbre");
+        Put_Line ("2. Créer un arbre");
+        Put_Line ("3. Supprimer un arbre");
+        Put_Line ("4. Changer la verbosité (" & getTrimmedInt(Verbosity) & " actuellement)");
+        Put_Line ("q. Quitter");
+        New_Line;
 
-        case MainMenuChoice is
-            when 1 =>
-                ShowMainMenu := True;
-                HandleChooseTree(CurrentTree);
-            when 2 =>
-                ShowMainMenu := True;
-                HandleCreateTree(CurrentTree);
-            when 3 =>
-                ShowMainMenu := True;
-                HandleDeleteTree;
-            when 4 =>
-                ShowMainMenu := True;
-                HandleChangeVerbosity;
-            when 5 =>
-                ExitMainMenu := True;
-            when others =>
-                Put(getColoredString("Choix invalide, veuillez réessayer (1-5): ", ERROR));
-                ShowMainMenu := False;
-        end case;
+        HandleInput (Pointer => MainMenuChoice'Access, Stop => ExitMainMenu'Access, TextString => "Entrez votre choix " & getMenuRangeString (4) & ": ", InputType => INT, MaxInt => 4);
+
+        if not ExitMainMenu then
+            case Integer'Value(To_String(MainMenuChoice)) is
+                when 1 =>
+                    HandleTreeOperation (CHOOSE);
+                when 2 =>
+                    HandleCreateTree;
+                when 3 =>
+                    HandleTreeOperation (DELETE);
+                when 4 =>
+                    HandleChangeVerbosity;
+                when others =>
+                    Null;
+            end case;
+        end if;
     end loop;
 end Menu;

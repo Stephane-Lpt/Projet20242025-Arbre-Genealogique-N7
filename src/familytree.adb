@@ -1,8 +1,47 @@
 with Ada.Text_IO;         use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with utils;               use utils;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 
 package body FamilyTree is
+
+   function GetExampleFamilyTree return T_FamilyTree is
+      FamilyTree : T_FamilyTree;
+   begin
+      initChild(FamilyTree, 1, Person.initPersonObj(
+            FirstName => To_Unbounded_String("Victor"),
+            LastName => To_Unbounded_String("Wembanyama"),
+            Gender => To_Unbounded_String("Male"),
+            Birthdate => To_Unbounded_String("04-01-2004")
+      ));
+      addAncestor(FamilyTree, 1, LEFT, 2, Person.initPersonObj(
+            FirstName => To_Unbounded_String("LeBron"),
+            LastName => To_Unbounded_String("James"),
+            Gender => To_Unbounded_String("Male"),
+            Birthdate => To_Unbounded_String("30-12-1984")
+      ));
+      addAncestor(FamilyTree, 1, RIGHT, 3, Person.initPersonObj(
+            FirstName => To_Unbounded_String("Lisa"),
+            LastName => To_Unbounded_String("Leslie"),
+            Gender => To_Unbounded_String("Female"),
+            Birthdate => To_Unbounded_String("07-07-1972")
+      ));
+      addAncestor(FamilyTree, 3, LEFT, 4, Person.initPersonObj(
+            FirstName => To_Unbounded_String("Kobe"),
+            LastName => To_Unbounded_String("Bryant"),
+            Gender => To_Unbounded_String("Male"),
+            Birthdate => To_Unbounded_String("23-08-1978")
+      ));
+      addAncestor(FamilyTree, 4, RIGHT, 5, Person.initPersonObj(
+            FirstName => To_Unbounded_String("Michael"),
+            LastName => To_Unbounded_String("Jordan"),
+            Gender => To_Unbounded_String("Male"),
+            Birthdate => To_Unbounded_String("17-02-1963")
+      ));
+
+      return FamilyTree;
+   end GetExampleFamilyTree;
 
    function isEmpty(ABR : in T_FamilyTree) return Boolean is
    begin
@@ -107,7 +146,6 @@ package body FamilyTree is
    -- Afficher l’arbre.
    procedure showFamilyTree (ABR : in T_FamilyTree; Verbosity : in Integer := 1) is
    begin
-      Put_Line("Size: " & getSize(ABR)'Image);
       showTree (ABR => ABR, PropToShow => Elements, Verbosity => Verbosity);
    end showFamilyTree;
 
@@ -158,7 +196,7 @@ package body FamilyTree is
       return getNode(ABR, Key);
    end getFamilyNode;
 
-   procedure printKey(ABR : in T_FamilyTree) is 
+   procedure printKey(ABR : in T_FamilyTree) is
    begin
       Put_Line(Integer'Image(getKey(ABR)));
    end printKey;

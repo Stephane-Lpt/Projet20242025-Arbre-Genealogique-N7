@@ -4,7 +4,13 @@ with Ada.Characters; use Ada.Characters;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package body utils is
-   
+
+   function getMenuRangeString(Length : in Integer) return String is
+      RangeString : Unbounded_String;
+   begin
+        return "(1-" & getTrimmedInt(Length) & " ou 'q')";
+   end getMenuRangeString;
+
    function getIndent(Depth : in Integer) return String is
       IndentLength : Integer := Depth * 4;
       Indent : String(1..IndentLength);

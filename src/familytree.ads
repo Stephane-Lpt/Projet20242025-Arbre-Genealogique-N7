@@ -18,6 +18,8 @@ package FamilyTree is
    -- TREE CHAINED LIST
    package TreeVector is new Ada.Containers.Vectors (Index_Type => Natural, Element_Type => T_FamilyTree);
 
+   function GetExampleFamilyTree return T_FamilyTree;
+
    function isEmpty(ABR : in T_FamilyTree) return Boolean;
 
    function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean;
@@ -67,8 +69,10 @@ package FamilyTree is
 
    function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree;
 
+   --  REMOVE?
    function getFamilyNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree;
 
+   --  REMOVE?
    procedure printKey(ABR : in T_FamilyTree);
 
 end FamilyTree;
