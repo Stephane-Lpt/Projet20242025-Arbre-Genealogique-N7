@@ -24,7 +24,7 @@ package body FamilyTree is
 
    procedure deleteAncestor (ABR : in out T_FamilyTree; TargetKey : in Integer) is
    begin
-      Null;
+      deleteNodeRecursive (ABR, TargetKey);
    end deleteAncestor;
 
    -- Renvoie le nombre de générations dans un arbre donné
@@ -167,6 +167,11 @@ package body FamilyTree is
    begin
       Tree.clean(ABR); -- Appel à la version générique
    end clean;
+
+   function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean is
+   begin
+      return Tree.isPresent(ABR, Key);
+   end isPresent;
 
 
 end FamilyTree;

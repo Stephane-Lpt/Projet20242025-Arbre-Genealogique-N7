@@ -64,5 +64,7 @@ package FamilyTree is
 
    procedure clean (ABR : in out T_FamilyTree);
 
+   function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean;
+
 
 end FamilyTree;

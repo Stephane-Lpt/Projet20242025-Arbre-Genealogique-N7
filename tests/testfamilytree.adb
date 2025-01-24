@@ -25,6 +25,82 @@ procedure TestFamilyTree is
       return FamilyTree;
    end createOrdinaryFamilyTree;
 
+   procedure TestDeleteAncestor is
+      TestTree : T_FamilyTree;
+      
+      function createOrdinaryFamilyTree return T_FamilyTree is
+         FT : T_FamilyTree;
+      begin
+         initChild(FT, 1, initPersonObj);
+         addAncestor(FT, 1, LEFT, 2, initPersonObj);
+         addAncestor(FT, 1, RIGHT, 3, initPersonObj);
+         addAncestor(FT, 3, LEFT, 4, initPersonObj);
+         addAncestor(FT, 4, RIGHT, 5, initPersonObj);
+         return FT;
+      end createOrdinaryFamilyTree;
+
+   begin
+      -- ##########################################################
+      Put_Line("Test 1: Suppression feuille (clé 5)");
+      TestTree := createOrdinaryFamilyTree;
+      deleteAncestor(TestTree, 5);
+      
+      pragma Assert(
+         not isPresent(TestTree, 5) and 
+         isPresent(TestTree, 4) and 
+         isPresent(TestTree, 3),
+         "Échec suppression feuille"
+      );
+      Put_Line("✓ Test 1 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 2: Suppression sous-arbre (clé 3)");
+      TestTree := createOrdinaryFamilyTree;
+      deleteAncestor(TestTree, 3);
+      
+      pragma Assert(
+         not isPresent(TestTree, 3) and 
+         not isPresent(TestTree, 4) and 
+         not isPresent(TestTree, 5) and 
+         isPresent(TestTree, 1) and 
+         isPresent(TestTree, 2),
+         "Échec suppression sous-arbre"
+      );
+      Put_Line("✓ Test 2 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 3: Suppression racine (clé 1)");
+      TestTree := createOrdinaryFamilyTree;
+      deleteAncestor(TestTree, 1);
+      
+      pragma Assert(
+         isEmpty(TestTree),
+         "Échec suppression racine"
+      );
+      Put_Line("✓ Test 3 réussi");
+
+      -- ##########################################################
+      Put_Line("Test 4: Clé inexistante (999)");
+      TestTree := createOrdinaryFamilyTree;
+      deleteAncestor(TestTree, 999);  -- Ne devrait rien modifier
+      
+      exception
+         when Tree.Absent_Key_Exception =>
+            pragma Assert(not isEmpty(getNode (TestTree, 1)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
+            pragma Assert(not isEmpty(getNode (TestTree, 2)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
+            pragma Assert(not isEmpty(getNode (TestTree, 3)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
+            pragma Assert(not isEmpty(getNode (TestTree, 4)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
+            pragma Assert(not isEmpty(getNode (TestTree, 5)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
+            Put_Line("Test 4 réussi: L'exception Absent_Key_Exception a été levée comme prévu et aucun noeud de l'arbre a été supprimé !");
+         when others =>
+            Put_Line("Test 4 réussi: L'exception Absent_Key_Exception a été levée comme prévu !");
+
+      Put_Line("Test 4 réussi: Aucun noeud n'a été supprimé car la clé 99 n'existe pas.");
+
+   end TestDeleteAncestor;
+
    procedure TestGetGenerationsCount is
       TestTree : T_FamilyTree;
       TempTree : T_FamilyTree;
@@ -235,6 +311,7 @@ procedure TestFamilyTree is
    end TestGetDualParentIndividuals;
 
 begin
+   TestDeleteAncestor;
    TestGetGenerationsCount;
    TestGetAncestorsCount;
    TestGetAncestorsByGeneration;
