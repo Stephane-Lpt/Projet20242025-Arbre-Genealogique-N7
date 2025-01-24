@@ -147,10 +147,9 @@ procedure Menu is
 
     end TreeMenu;
     
-    procedure HandleInput(Pointer : in String_Access; Stop : in Boolean_Access; TextString : in String; InputType : in T_InputType := STR; MaxInt : in Integer := -1) is
+    procedure HandleInput(Pointer : in String_Access; TextString : in String; InputType : in T_InputType := STR; MaxInt : in Integer := -1) is
         -- GET IMPUT FROM USER
         -- Pointer : pointer to the string that is going to be modified
-        -- Stop : pointer to the stop flag (in case of 'q')
         -- TextString : Input prompt string 
         -- InputType : Expected input type from user (either string or integer)
         -- MaxInt : Maximum int that can be entered by user
@@ -168,8 +167,7 @@ procedure Menu is
                 Input := To_Unbounded_String(Get_Line);
 
                 if Input = QuitCharacter then
-                    ExitInput := True;
-                    Stop.all := True;
+                    raise OperationAbandonnedException;
                 else
                     if InputType = INT then
                         --  IN CASE WHEN ASKED FOR AN INTEGER, CHECKING IF IT'S A VALID INT
@@ -291,7 +289,7 @@ procedure Menu is
     begin
         New_Line;
         if Position = ROOT then
-            Put_Line ("--- Ajoute de l'enfant ---");
+            Put_Line ("--- Ajout de l'enfant ---");
         else
             Put_Line ("--- Ajout d'un nouvel ancêtre ---");
         end if;
@@ -302,13 +300,12 @@ procedure Menu is
         --  if NewPersonKey = -1 then
         --      ExitCreateNewPersonMenu := True;
         --  end if;
-
-        HandleInput (Pointer => FirstName'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le prénom de la personne: ");
-        if not ExitCreateNewPersonMenu then HandleInput (Pointer => LastName'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le nom de la personne: "); end if;
-        if not ExitCreateNewPersonMenu then HandleInput (Pointer => Gender'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez le sexe de la personne: "); end if;
-        if not ExitCreateNewPersonMenu then HandleInput (Pointer => Birthdate'Access, Stop => ExitCreateNewPersonMenu'Access, TextString => "Entrez la date d'anniversaire de la personne: "); end if;
-        
-        if not ExitCreateNewPersonMenu then
+        begin
+            HandleInput (Pointer => FirstName'Access, TextString => "Entrez le prénom de la personne: ");
+            HandleInput (Pointer => LastName'Access, TextString => "Entrez le nom de la personne: ");
+            HandleInput (Pointer => Gender'Access, TextString => "Entrez le sexe de la personne: ");
+            HandleInput (Pointer => Birthdate'Access, TextString => "Entrez la date d'anniversaire de la personne: ");
+            
             NewPerson := initPersonObj(
                 FirstName => FirstName, 
                 LastName => LastName, 
@@ -320,19 +317,20 @@ procedure Menu is
                 New_Line;
                 Put_Line(getColoredString("Un nouvel ancêtre a été ajoutée", SUCCESS));
             end if;
-        else
-            New_Line;
-            if Position /= ROOT then
-                Put_Line(getColoredString("Abandon de l'operation. L'ancêtre n'a pas été ajouté.", WARNING));
-            else
-                Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
-            end if;
 
-            raise OperationAbandonnedException;
-        end if;
+        exception
+            when OperationAbandonnedException =>
+                New_Line;
+                if Position /= ROOT then
+                    Put_Line(getColoredString("Abandon de l'operation. L'ancêtre n'a pas été ajouté.", WARNING));
+                else
+                    Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
+                end if;
+
+                raise OperationAbandonnedException;
+        end;
     end HandleCreateNewPerson;
 
-    ExitTreeOperationMenu : aliased Boolean := False;
     TreeOperationIndex : aliased Unbounded_String;
     procedure HandleTreeOperation(Operation : in T_OperationType) is
         TitleText : String := (if Operation = CHOOSE then "Choisir un arbre" else "Supprimer un arbre");
@@ -346,9 +344,9 @@ procedure Menu is
             New_Line;
 
             TreeOperationIndex := To_Unbounded_String("-1");
-            HandleInput (Pointer => TreeOperationIndex'Access, Stop => ExitTreeOperationMenu'Access, TextString => "Entrez votre choix " & getMenuRangeString (GetExistingTreesLength) & ": ", InputType => INT, MaxInt => GetExistingTreesLength - 1);
+            begin
+                HandleInput (Pointer => TreeOperationIndex'Access, TextString => "Entrez votre choix " & getMenuRangeString (GetExistingTreesLength) & ": ", InputType => INT, MaxInt => GetExistingTreesLength - 1);
 
-            if not ExitTreeOperationMenu then
                 if Operation = CHOOSE then
                     CurrentTree := ExistingTrees.Element (Integer'Value(To_String(TreeOperationIndex)) - 1);
 
@@ -362,14 +360,17 @@ procedure Menu is
                     Put_Line(getColoredString("L'arbre '" & To_String(ExistingTrees.Element(Integer'Value(To_String(TreeOperationIndex)) - 1).Name) & "' a été supprimé.", SUCCESS));
                     Delete(ExistingTrees, Integer'Value(To_String(TreeOperationIndex)) - 1);
                 end if;
-            end if;
+            
+            exception
+                when OperationAbandonnedException =>
+                    Null;
+            end;
         else
             New_Line;
             Put_Line(getColoredString("Aucun arbre existant. Veuillez d'abord en créer un.", WARNING));
         end if;
     end HandleTreeOperation;
 
-    ExitCreateNewTreeMenu : aliased Boolean := False;
     NewTreeName : aliased Unbounded_String;
     procedure HandleCreateTree is
         Tree: T_FamilyTree renames CurrentTree.Tree;
@@ -378,9 +379,9 @@ procedure Menu is
         Put_Line ("--- Créer un arbre ---");
         New_Line;
 
-        HandleInput (Pointer => NewTreeName'Access, Stop => ExitCreateNewTreeMenu'Access, TextString => "Entrez le nom de l'arbre à créer ('q' pour quitter): ");
+        begin
+            HandleInput (Pointer => NewTreeName'Access, TextString => "Entrez le nom de l'arbre à créer ('q' pour quitter): ");
         
-        if not ExitCreateNewTreeMenu then
             AddNewTree (To_String(NewTreeName));
 
             begin
@@ -395,10 +396,11 @@ procedure Menu is
                 when OperationAbandonnedException =>
                     Null;
             end;
-        else
-            New_Line;
-            Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
-        end if;
+        exception
+            when OperationAbandonnedException =>
+                New_Line;
+                Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
+        end;
     end HandleCreateTree;
 	
     NewVerbosity : aliased Unbounded_String;
@@ -418,23 +420,25 @@ procedure Menu is
         New_Line;
 
 	    NewVerbosity := To_Unbounded_String("-1");
-        HandleInput (Pointer => NewVerbosity'Access, Stop => ExitChangeVerbosityMenu'Access, TextString => "Entrez votre choix " & getMenuRangeString (4) & ": ", InputType => INT, MaxInt => 4);
+        begin
+            HandleInput (Pointer => NewVerbosity'Access, TextString => "Entrez votre choix " & getMenuRangeString (4) & ": ", InputType => INT, MaxInt => 4);
 
-        if not ExitChangeVerbosityMenu then
             if Integer'Value(To_String(NewVerbosity)) /= -1 then
                 Verbosity := Integer'Value(To_String(NewVerbosity));
                 New_Line;
                 Put_Line (getColoredString("La verbosité a été définie à" & Integer'Image(Verbosity), SUCCESS));
             end if;
-        end if;
+        exception
+            when OperationAbandonnedException =>
+                Null;
+        end;
     end HandleChangeVerbosity;
 
     MainMenuChoice : aliased Unbounded_String;
-    ExitMainMenu : aliased Boolean := False;
 begin
     AddDefaultTree;
 
-    while not ExitMainMenu loop
+    while True loop
         New_Line;
         Put_Line ("--- Menu principal ---");
         New_Line;
@@ -445,9 +449,9 @@ begin
         Put_Line ("q. Quitter");
         New_Line;
 
-        HandleInput (Pointer => MainMenuChoice'Access, Stop => ExitMainMenu'Access, TextString => "Entrez votre choix " & getMenuRangeString (4) & ": ", InputType => INT, MaxInt => 4);
+        begin
+            HandleInput (Pointer => MainMenuChoice'Access, TextString => "Entrez votre choix " & getMenuRangeString (4) & ": ", InputType => INT, MaxInt => 4);
 
-        if not ExitMainMenu then
             case Integer'Value(To_String(MainMenuChoice)) is
                 when 1 =>
                     HandleTreeOperation (CHOOSE);
@@ -460,6 +464,9 @@ begin
                 when others =>
                     Null;
             end case;
-        end if;
+        exception
+            when OperationAbandonnedException =>
+                exit;
+        end;
     end loop;
 end Menu;
