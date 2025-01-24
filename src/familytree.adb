@@ -53,7 +53,7 @@ package body FamilyTree is
    function getAncestorsCount
    (ABR : in T_FamilyTree; Key : in Integer) return Integer 
    is
-      Node : constant T_FamilyTree := getFamilyNode(ABR, Key);
+      Node : constant T_FamilyTree := getNode(ABR, Key);
    begin
       return getSize(Node); -- Utilise la fonction getSize existante du BinaryTree
    end getAncestorsCount;
@@ -63,7 +63,7 @@ package body FamilyTree is
                                     Key : in Integer; 
                                     Generation : in Integer) return TreeVector.Vector is
 
-      TargetABR : constant T_FamilyTree := getFamilyNode(ABR, Key);
+      TargetABR : constant T_FamilyTree := getNode(ABR, Key);
 
       -- Fonction helper récursive pour collecter les ancêtres à la génération cible
       function Helper (ABR : T_FamilyTree; CurrentGen : Integer) return TreeVector.Vector is
@@ -135,6 +135,7 @@ package body FamilyTree is
    -- Getters
    --function 
    
+   -- TODO : Peut être le mettre dans BinaryTree
    function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree is
    begin
       case Position is
@@ -147,10 +148,10 @@ package body FamilyTree is
       end case;
    end getParent;
 
-   function getFamilyNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree is
+   function getNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree is
    begin
-      return getNode(ABR, Key);
-   end getFamilyNode;
+      return Tree.getNode(ABR, Key);
+   end getNode;
 
    function isEmpty (ABR : in T_FamilyTree) return Boolean is
    begin

@@ -164,8 +164,8 @@ procedure TestFamilyTree is
       Put_Line("Test 1: Ancêtres génération 1 (clé 1)");
       
       -- Résultat attendu : [2, 3]
-      ExpectedAncestors.Append(getFamilyNode(Family, 2));
-      ExpectedAncestors.Append(getFamilyNode(Family, 3));
+      ExpectedAncestors.Append(getNode(Family, 2));
+      ExpectedAncestors.Append(getNode(Family, 3));
       
       AncestorsResult := getAncestorsByGeneration(Family, 1, 1);
       
@@ -180,7 +180,7 @@ procedure TestFamilyTree is
       Put_Line("Test 2: Ancêtres génération 2 (clé 1)");
       
       -- Résultat attendu : [4]
-      ExpectedAncestors.Append(getFamilyNode(Family, 4));
+      ExpectedAncestors.Append(getNode(Family, 4));
       
       AncestorsResult := getAncestorsByGeneration(Family, 1, 2);
       
@@ -195,7 +195,7 @@ procedure TestFamilyTree is
       Put_Line("Test 3: Ancêtres génération 3 (clé 1)");
       
       -- Résultat attendu : [5]
-      ExpectedAncestors.Append(getFamilyNode(Family, 5));
+      ExpectedAncestors.Append(getNode(Family, 5));
       
       AncestorsResult := getAncestorsByGeneration(Family, 1, 3);
       
