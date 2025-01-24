@@ -69,4 +69,6 @@ package FamilyTree is
 
    function getFamilyNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree;
 
+   procedure printKey(ABR : in T_FamilyTree);
+
 end FamilyTree;

@@ -61,6 +61,8 @@ procedure Menu is
     NewPersonKey : aliased Integer;
     NewTreeName : aliased Unbounded_String;
 
+    QUIT_FLAG_CREATE_PERSON :  Boolean := False;
+
     procedure TreeMenu is
         procedure HandleAddAncestor is
         begin
@@ -114,8 +116,15 @@ procedure Menu is
 
         Choice : Integer;
         ExitTreeMenu : Boolean := False;
+        ChosenTree : T_FamilyTree;
 
     begin
+        Put_Line("check");
+        ChosenTree := CurrentTree.Tree;
+        showFamilyTree (ChosenTree, 4);
+        New_Line;
+        Put_Line("vector length: " & Integer(ExistingTrees.Length)'Image);
+        Put_Line("check");
         while not ExitTreeMenu loop
             New_Line;
             Put_Line ("--- Gestion de l'arbre " & To_String(CurrentTree.Name) & " ---");
@@ -352,30 +361,25 @@ procedure Menu is
                             LastName => LastName, 
                             Gender => Gender, 
                             BirthDate => Birthdate
-                        );               
-                        --  if POSITION = ROOT then
-                        --      initChild (CurrentTree.Tree, IntegerKey, Person);
-                        --  else
-                        --      addAncestor (CurrentTree.Tree, TargetKey, Position, IntegerKey, Person);
-                        --  end if;
+                        );
                     end if;
-                else 
-                    ExitCreateNewPersonMenu := True;
                 end if;
 
                 if ExitCreateNewPersonMenu then
+                    QUIT_FLAG_CREATE_PERSON := True;
                     New_Line;
-                    if Position = ROOT then
-                        Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée'.", WARNING));
-                    else
+                    if Position /= ROOT then
                         Put_Line(getColoredString("Abandon de l'operation. L'ancêtre n'a pas été ajouté.", WARNING));
+                    else
+                        Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
                     end if;
                 else 
-                    New_Line;
-                    Put_Line(getColoredString("Une nouvelle personne a été ajoutée", SUCCESS));
+                    if Position /= ROOT then
+                        New_Line;
+                        Put_Line(getColoredString("Une nouvelle personne a été ajoutée", SUCCESS));
+                    end if;
                 end if;
                 ExitCreateNewPersonMenu := True;
-                ShowCreateNewPersonMenu := True;
             exception
                 when Data_Error | Constraint_Error =>
                     Skip_Line;
@@ -388,7 +392,7 @@ procedure Menu is
         ExitCreateNewPersonMenu := False;
     end HandleCreateNewPerson;
 
-    procedure HandleChooseTree is
+    procedure HandleChooseTree(CurrentTree : in out TreeTuple) is
         ExitChooseTreeMenu : Boolean := False;
         ShowChooseTreeMenu : Boolean := True;
         ChoicesIndex : String := "(1-" & Trim(getExistingTreesLength'Image, Ada.Strings.Left) & ")";
@@ -421,6 +425,7 @@ procedure Menu is
                         New_Line;
                         Put_Line(getColoredString("L'arbre '" & To_String(CurrentTree.Name) & "' a été choisi.", SUCCESS)); 
                         TreeMenu;
+                        --  addAncestor (ABR => CurrentTree.Tree, TargetKey => 1, Position => LEFT, NewKey => 2, NewPerson => initPersonObj);
                     end if;
                 end if;
                 ExitChooseTreeMenu := True;
@@ -435,7 +440,8 @@ procedure Menu is
         end loop;
     end HandleChooseTree;
 
-    procedure HandleCreateTree is
+    procedure HandleCreateTree(CurrentTree : in out TreeTuple) is
+        Tree : T_FamilyTree;
     begin
         ExitCreateNewTreeMenu := False;
         while not ExitCreateNewTreeMenu loop
@@ -449,15 +455,13 @@ procedure Menu is
                 AddNewTree (To_String(NewTreeName));
                 HandleCreateNewPerson;
 
-                if not ExitCreateNewPersonMenu then
+                if not QUIT_FLAG_CREATE_PERSON then
                     CurrentTree := ExistingTrees.Element(Index => Integer(ExistingTrees.Length) - 1);
-                    Put_Line("Current tree: " & To_String(CurrentTree.Name));
-                    --  initChild (CurrentTree.Tree, NewPersonKey, NewPerson);
-                    initChild (CurrentTree.Tree, 1, initPersonObj);
-                    --  addAncestor (ABR => CurrentTree.Tree, TargetKey => 1, Position => LEFT, NewKey => 2, NewPerson => initPersonObj);
-                    Put_Line("Current tree: " & To_String(CurrentTree.Name));
-                else
-                    Put_Line("NOT ENTERED");
+                    Tree := CurrentTree.Tree;
+                    initChild (Tree, NewPersonKey, NewPerson);
+                    showFamilyTree (Tree);
+                    New_Line;
+                    Put_Line(getColoredString("L'arbre " & To_String(CurrentTree.Name) & " a été crée.", SUCCESS));
                 end if;
             else
                 Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée'.", WARNING));
@@ -555,9 +559,20 @@ procedure Menu is
     end HandleChangeVerbosity;
 
 begin
+    Put_Line(Integer(ExistingTrees.Length)'Image);
     AddDefaultTree;
 
-    while not ExitMainMenu loop
+    HandleCreateTree(CurrentTree);
+    
+    Put_Line(Integer(ExistingTrees.Length)'Image);
+
+    for el of ExistingTrees loop
+        showFamilyTree (el.Tree);
+    end loop;
+    
+    Put_Line(Integer(ExistingTrees.Length)'Image);
+
+    while ExitMainMenu loop
         if ShowMainMenu then
             New_Line;
             Put_Line ("--- Menu principal ---");
@@ -582,10 +597,10 @@ begin
         case MainMenuChoice is
             when 1 =>
                 ShowMainMenu := True;
-                HandleChooseTree;
+                HandleChooseTree(CurrentTree);
             when 2 =>
                 ShowMainMenu := True;
-                HandleCreateTree;
+                HandleCreateTree(CurrentTree);
             when 3 =>
                 ShowMainMenu := True;
                 HandleDeleteTree;

@@ -107,6 +107,7 @@ package body FamilyTree is
    -- Afficher l’arbre.
    procedure showFamilyTree (ABR : in T_FamilyTree; Verbosity : in Integer := 1) is
    begin
+      Put_Line("Size: " & getSize(ABR)'Image);
       showTree (ABR => ABR, PropToShow => Elements, Verbosity => Verbosity);
    end showFamilyTree;
 
@@ -156,5 +157,10 @@ package body FamilyTree is
    begin
       return getNode(ABR, Key);
    end getFamilyNode;
+
+   procedure printKey(ABR : in T_FamilyTree) is 
+   begin
+      Put_Line(Integer'Image(getKey(ABR)));
+   end printKey;
 
 end FamilyTree;

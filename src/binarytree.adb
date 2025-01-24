@@ -219,7 +219,6 @@ package body BinaryTree is
       ABR.Left := Child;
    end setLeftChild;
 
-
    function getRightChild (ABR : T_BinaryTree) return T_BinaryTree is
    begin
       return ABR.Right;
