@@ -47,10 +47,7 @@ procedure Menu is
     type Boolean_Access is Access all Boolean;
     type Person_Access is Access all T_Person;
 
-    QUIT_FLAG_CREATE_PERSON :  Boolean := False;
-    
-    MainMenuChoice : aliased Unbounded_String;
-    ExitMainMenu : aliased Boolean := False;
+    OperationAbandonnedException : exception;
 
     procedure TreeMenu is
         procedure HandleAddAncestor is
@@ -155,6 +152,8 @@ procedure Menu is
         -- Pointer : pointer to the string that is going to be modified
         -- Stop : pointer to the stop flag (in case of 'q')
         -- TextString : Input prompt string 
+        -- InputType : Expected input type from user (either string or integer)
+        -- MaxInt : Maximum int that can be entered by user
         ExitInput : Boolean := False;
         ShowTextString : Boolean := True;
         Input : Unbounded_String;
@@ -322,13 +321,14 @@ procedure Menu is
                 Put_Line(getColoredString("Un nouvel ancêtre a été ajoutée", SUCCESS));
             end if;
         else
-            QUIT_FLAG_CREATE_PERSON := True;
             New_Line;
             if Position /= ROOT then
                 Put_Line(getColoredString("Abandon de l'operation. L'ancêtre n'a pas été ajouté.", WARNING));
             else
                 Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
             end if;
+
+            raise OperationAbandonnedException;
         end if;
     end HandleCreateNewPerson;
 
@@ -382,15 +382,19 @@ procedure Menu is
         
         if not ExitCreateNewTreeMenu then
             AddNewTree (To_String(NewTreeName));
-            HandleCreateNewPerson;
 
-            if not QUIT_FLAG_CREATE_PERSON then
+            begin
+                HandleCreateNewPerson;
+
                 CurrentTree := ExistingTrees.Element(Index => ExistingTrees.Last_Index);
                 initChild (Tree, NewPersonKey, NewPerson);
                 ExistingTrees.Replace_Element(ExistingTrees.Last_Index, CurrentTree);
                 New_Line;
                 Put_Line(getColoredString("L'arbre " & To_String(CurrentTree.Name) & " a été crée.", SUCCESS));
-            end if;
+            exception
+                when OperationAbandonnedException =>
+                    Null;
+            end;
         else
             New_Line;
             Put_Line(getColoredString("Abandon de l'operation. L'arbre n'a pas été crée.", WARNING));
@@ -425,6 +429,8 @@ procedure Menu is
         end if;
     end HandleChangeVerbosity;
 
+    MainMenuChoice : aliased Unbounded_String;
+    ExitMainMenu : aliased Boolean := False;
 begin
     AddDefaultTree;
 
