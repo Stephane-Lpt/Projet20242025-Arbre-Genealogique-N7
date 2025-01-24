@@ -156,7 +156,33 @@ package body FamilyTree is
    -- 8. Obtenir l’ensemble des individus dont les deux parents sont connus.
    function getDualParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector is
       DualParentIndividuals : TreeVector.Vector;
+      TargetNode : constant T_BinaryTree := getNode(ABR, Key);
+
+      procedure TraverseAndCollect(Node : T_BinaryTree) is
+         Left, Right : T_BinaryTree;
+      begin
+         if isEmpty(Node) then
+            return;
+         end if;
+
+         Left := getLeftChild(Node);
+         Right := getRightChild(Node);
+
+         -- Vérifier si les deux parents sont connus
+         if not isEmpty(Left) and not isEmpty(Right) then
+            DualParentIndividuals.Append(Node);
+         end if;
+
+         -- Explorer récursivement les deux branches
+         TraverseAndCollect(Left);
+         TraverseAndCollect(Right);
+      end TraverseAndCollect;
+
    begin
+      if not isEmpty(TargetNode) then
+         TraverseAndCollect(TargetNode);
+      end if;
+
       return DualParentIndividuals;
    end getDualParentIndividuals;
 

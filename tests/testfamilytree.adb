@@ -454,8 +454,124 @@ procedure TestFamilyTree is
    end TestGetSingleParentIndividuals;
 
    procedure TestGetDualParentIndividuals is
-   begin 
-      Null;
+      TestTree : T_FamilyTree;
+      Result   : TreeVector.Vector;
+      Expected : TreeVector.Vector;
+
+      -- Arbre complexe de référence
+      procedure Build_Complex_Tree is
+      begin
+         initFamilyTree(TestTree);
+         initChild(TestTree, 1, initPersonObj);
+         
+         -- Niveau 1 (racine avec 2 parents)
+         addAncestor(TestTree, 1, LEFT, 2, initPersonObj);
+         addAncestor(TestTree, 1, RIGHT, 3, initPersonObj);
+         
+         -- Niveau 2 
+         addAncestor(TestTree, 2, LEFT, 4, initPersonObj);  -- 2 a 1 parent
+         addAncestor(TestTree, 3, LEFT, 5, initPersonObj);   -- 3 a 1 parent
+         addAncestor(TestTree, 3, RIGHT, 6, initPersonObj);  -- 3 a 2 parents
+         
+         -- Niveau 3
+         addAncestor(TestTree, 6, LEFT, 7, initPersonObj);   -- 6 a 2 parents
+         addAncestor(TestTree, 6, RIGHT, 8, initPersonObj);
+      end Build_Complex_Tree;
+
+      function Contains_Key(Key : Integer) return Boolean is
+      begin
+         for E of Result loop
+            if getKey(E) = Key then
+               return True;
+            end if;
+         end loop;
+         return False;
+      end Contains_Key;
+
+   begin
+      -- ##########################################################
+      Put_Line("Test 1: Arbre vide");
+      initFamilyTree(TestTree);
+      Result := getDualParentIndividuals(TestTree, 1);
+      pragma Assert(Length(Result) = 0, "Test 1 échoué");
+      Put_Line("✓ Test 1 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 2: Nœud unique sans parents");
+      initFamilyTree(TestTree);
+      initChild(TestTree, 1, initPersonObj);
+      Result := getDualParentIndividuals(TestTree, 1);
+      pragma Assert(Length(Result) = 0, "Test 2 échoué");
+      Put_Line("✓ Test 2 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 3: Racine avec un seul parent");
+      initFamilyTree(TestTree);
+      initChild(TestTree, 1, initPersonObj);
+      addAncestor(TestTree, 1, LEFT, 2, initPersonObj);
+      Result := getDualParentIndividuals(TestTree, 1);
+      pragma Assert(Length(Result) = 0, "Test 3 échoué");
+      Put_Line("✓ Test 3 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 4: Racine avec deux parents");
+      initFamilyTree(TestTree);
+      initChild(TestTree, 1, initPersonObj);
+      addAncestor(TestTree, 1, LEFT, 2, initPersonObj);
+      addAncestor(TestTree, 1, RIGHT, 3, initPersonObj);
+      Result := getDualParentIndividuals(TestTree, 1);
+      pragma Assert(Length(Result) = 1 and Contains_Key(1), "Test 4 échoué");
+      Put_Line("✓ Test 4 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 5: Arbre complexe multi-niveaux");
+      Build_Complex_Tree;
+      Result := getDualParentIndividuals(TestTree, 1);
+      
+      pragma Assert(
+         Length(Result) = 3 and
+         Contains_Key(1) and  -- Racine avec 2 parents
+         Contains_Key(3) and  -- Nœud 3 a 2 parents
+         Contains_Key(6),  -- Nœud 6 a 2 parents
+         "Test 5 échoué - Résultat : " & Integer'Image(Length(Result))
+      );
+      Put_Line("✓ Test 5 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 6: Clé inexistante");
+      Build_Complex_Tree;
+      Result := getDualParentIndividuals(TestTree, 999);
+      pragma Assert(Length(Result) = 0, "Test 6 échoué");
+      Put_Line("✓ Test 6 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 7: Hiérarchie profonde");
+      initFamilyTree(TestTree);
+      initChild(TestTree, 1, initPersonObj);
+      addAncestor(TestTree, 1, LEFT, 2, initPersonObj);
+      addAncestor(TestTree, 1, RIGHT, 3, initPersonObj);
+      addAncestor(TestTree, 2, LEFT, 4, initPersonObj);
+      addAncestor(TestTree, 2, RIGHT, 5, initPersonObj);
+      addAncestor(TestTree, 5, LEFT, 6, initPersonObj);
+      addAncestor(TestTree, 5, RIGHT, 7, initPersonObj); -- 5 a 2 parents
+      
+      Result := getDualParentIndividuals(TestTree, 1);
+      pragma Assert(
+         Length(Result) = 3 and
+         Contains_Key(1) and
+         Contains_Key(2) and
+         Contains_Key(5),
+         "Test 7 échoué"
+      );
+      Put_Line("✓ Test 7 réussi");
+      clean(TestTree);
+
    end TestGetDualParentIndividuals;
 
 begin
@@ -464,7 +580,7 @@ begin
    TestGetAncestorsCount;
    TestGetAncestorsByGeneration;
    TestGetSingleParentIndividuals;
-   -- TestGetDualParentIndividuals;
+   TestGetDualParentIndividuals;
 
 end TestFamilyTree;
 
