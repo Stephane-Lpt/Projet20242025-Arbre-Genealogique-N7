@@ -60,11 +60,16 @@ package FamilyTree is
 
    function isEmpty (ABR : in T_FamilyTree) return Boolean;
 
-   function Length(Vector: TreeVector.Vector) return Integer;
-
    procedure clean (ABR : in out T_FamilyTree);
 
    function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean;
 
+   function getKey (ABR : T_FamilyTree) return Integer;
+
+   -- Vectors helper functions
+
+   function Length(Vector: TreeVector.Vector) return Integer;
+
+   function First_Element(Vector: TreeVector.Vector) return T_FamilyTree;
 
 end FamilyTree;

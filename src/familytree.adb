@@ -120,8 +120,36 @@ package body FamilyTree is
 
    -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector is
-       SingleParentIndividuals : TreeVector.Vector;
+      SingleParentIndividuals : TreeVector.Vector;
+      TargetNode : constant T_BinaryTree := getNode(ABR, Key);
+
+      procedure TraverseAndCollect(Node : T_BinaryTree) is
+         Left, Right : T_BinaryTree;
+      begin
+         if isEmpty(Node) then
+            return;
+         end if;
+
+         Left := getLeftChild(Node);
+         Right := getRightChild(Node);
+
+         -- Vérifier si un seul parent est connu
+         if (not isEmpty(Left) and isEmpty(Right)) or 
+            (isEmpty(Left) and not isEmpty(Right)) 
+         then
+            SingleParentIndividuals.Append(Node);
+         end if;
+
+         -- Explorer récursivement les deux branches
+         TraverseAndCollect(Left);
+         TraverseAndCollect(Right);
+      end TraverseAndCollect;
+
    begin
+      if not isEmpty(TargetNode) then
+         TraverseAndCollect(TargetNode);
+      end if;
+
       return SingleParentIndividuals;
    end getSingleParentIndividuals;
 
@@ -158,11 +186,6 @@ package body FamilyTree is
       return Tree.isEmpty(ABR);
    end isEmpty;
 
-   function Length(Vector: TreeVector.Vector) return Integer is
-   begin
-      return Integer(Vector.Length);
-   end Length;
-
    procedure clean (ABR : in out T_FamilyTree) is
    begin
       Tree.clean(ABR); -- Appel à la version générique
@@ -172,6 +195,22 @@ package body FamilyTree is
    begin
       return Tree.isPresent(ABR, Key);
    end isPresent;
+
+   function getKey (ABR : T_FamilyTree) return Integer is
+   begin
+      return Tree.getKey(ABR);
+   end getKey;
+
+   -- Vector helpers
+   function Length(Vector: TreeVector.Vector) return Integer is
+   begin
+      return Integer(Vector.Length);
+   end Length;
+
+   function First_Element(Vector: TreeVector.Vector) return T_FamilyTree is
+   begin
+      return Vector.First_Element;
+   end First_Element;
 
 
 end FamilyTree;
