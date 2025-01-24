@@ -54,7 +54,7 @@ procedure TestFamilyTree is
       clean(TestTree);
 
       -- ##########################################################
-      Put_Line("Test 2: Arbre à 1 nœud");s
+      Put_Line("Test 2: Arbre à 1 nœud");
       initChild(TestTree, 1, initPersonObj);
       pragma Assert(
          getGenerationsCount(TestTree) = 1,
@@ -184,7 +184,7 @@ procedure TestFamilyTree is
       
       AncestorsResult := getAncestorsByGeneration(Family, 1, 2);
       
-      pragma Assert(AncestorsResult = ExpectedAncestors and getLength(AncestorsResult) = 1, 
+      pragma Assert(AncestorsResult = ExpectedAncestors and Length(AncestorsResult) = 1, 
                    "Test 2 échoué : Mauvais grands-parents");
       Put_Line("Test 2 réussi ✓");
       ExpectedAncestors.Clear;

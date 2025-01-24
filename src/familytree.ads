@@ -58,9 +58,9 @@ package FamilyTree is
 
    function getFamilyNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree;
 
-   function IsNull (ABR : in T_FamilyTree) return Boolean;
+   function isEmpty (ABR : in T_FamilyTree) return Boolean;
 
-   function getLength(Vector: TreeVector.Vector) return Integer;
+   function Length(Vector: TreeVector.Vector) return Integer;
 
    procedure clean (ABR : in out T_FamilyTree);
 

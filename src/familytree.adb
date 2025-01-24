@@ -33,7 +33,7 @@ package body FamilyTree is
          Left_Depth  : Integer := 0;
          Right_Depth : Integer := 0;
       begin
-         if IsNull(Node) then
+         if isEmpty(Node) then
             return 0;
          else
             -- Calcul récursif des profondeurs gauche/droite
@@ -69,7 +69,7 @@ package body FamilyTree is
       function Helper (ABR : T_FamilyTree; CurrentGen : Integer) return TreeVector.Vector is
          Result : TreeVector.Vector;
       begin
-         if IsNull(ABR) then
+         if isEmpty(ABR) then
             return Result;  -- Fin de branche
          end if;
 
@@ -98,7 +98,7 @@ package body FamilyTree is
 
    begin
       -- Gestion des cas d'erreur
-      if IsNull(TargetABR) or Generation < 0 then
+      if isEmpty(TargetABR) or Generation < 0 then
          return TreeVector.Empty_Vector;
       end if;
 
@@ -152,15 +152,15 @@ package body FamilyTree is
       return getNode(ABR, Key);
    end getFamilyNode;
 
-   function IsNull (ABR : in T_FamilyTree) return Boolean is
+   function isEmpty (ABR : in T_FamilyTree) return Boolean is
    begin
-      return isEmpty(ABR);
-   end IsNull;
+      return Tree.isEmpty(ABR);
+   end isEmpty;
 
-   function getLength(Vector: TreeVector.Vector) return Integer is
+   function Length(Vector: TreeVector.Vector) return Integer is
    begin
       return Integer(Vector.Length);
-   end getLength;
+   end Length;
 
    procedure clean (ABR : in out T_FamilyTree) is
    begin
