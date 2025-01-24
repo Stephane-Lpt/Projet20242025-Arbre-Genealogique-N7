@@ -188,19 +188,6 @@ package body FamilyTree is
 
    -- Getters
    --function 
-   
-   -- TODO : Peut être le mettre dans BinaryTree
-   function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree is
-   begin
-      case Position is
-         when ROOT =>
-            raise Wrong_Position_Exception;
-         when LEFT =>
-            return getLeftChild (ABR);
-         when RIGHT =>
-            return getLeftChild (ABR);
-      end case;
-   end getParent;
 
    function getNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree is
    begin

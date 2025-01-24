@@ -54,8 +54,6 @@ package FamilyTree is
    function getDualParentIndividuals
      (ABR : in T_FamilyTree; Key : in Integer) return TreeVector.Vector;
 
-   function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree;
-
    function getNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree;
 
    function isEmpty (ABR : in T_FamilyTree) return Boolean;
