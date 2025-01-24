@@ -23,7 +23,7 @@ jobs:
 
     # Étape 3 : Compilation du projet
     - name: Build
-      run: gprbuild -j0 -p
+      run: gprbuild -P src/pim.gpr -j0 -p
 
     - name: Debug Build Directory
       run: ls -R ${{ github.workspace }}/build
