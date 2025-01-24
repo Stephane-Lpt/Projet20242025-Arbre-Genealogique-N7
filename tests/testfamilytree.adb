@@ -93,7 +93,7 @@ procedure TestFamilyTree is
       Put_Line("Test 4: Clé inexistante (999)");
       AncestorsResult := getAncestorsByGeneration(Family, 999, 1);
       pragma Assert(AncestorsResult.Is_Empty, 
-                   "Test 4 échoué : Résultat devrait être vide");
+                   "Test 4 échoué : Résultat non vide");
       Put_Line("Test 4 réussi ✓");
 
       -- ##########################################################
