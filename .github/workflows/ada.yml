@@ -34,7 +34,7 @@ jobs:
         if [ -d "build/bin" ]; then
           for file in build/bin/*; do
             if [ -x "$file" ]; then
-              echo "Running test: $file"
+              echo -e "\033[31mRunning test: $file\033[0m"
               "$file"
             else
               echo "Skipping: $file (not executable)"
@@ -44,4 +44,5 @@ jobs:
           echo "Test directory 'build/bin' not found!"
           exit 1
         fi
+
 
