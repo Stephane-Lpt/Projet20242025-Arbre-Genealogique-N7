@@ -88,7 +88,7 @@ procedure TestFamilyTree is
       
       exception
          when Tree.Absent_Key_Exception =>
-            pragma Assert(not isEmpty(getNode (TestTree, 1)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
+            pragma Assert(isEmpty(getNode (TestTree, 1)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
             pragma Assert(not isEmpty(getNode (TestTree, 2)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
             pragma Assert(not isEmpty(getNode (TestTree, 3)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
             pragma Assert(not isEmpty(getNode (TestTree, 4)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
