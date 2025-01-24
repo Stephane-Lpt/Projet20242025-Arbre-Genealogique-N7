@@ -25,6 +25,9 @@ jobs:
     - name: Build
       run: gprbuild -j0 -p
 
+    - name: Debug Build Directory
+      run: ls -R ${{ github.workspace }}/build
+      
     # Étape 4 : Exécution des tests
     - name: Run Tests
       run: |
