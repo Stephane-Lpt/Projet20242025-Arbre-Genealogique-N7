@@ -36,60 +36,75 @@ procedure TestFamilyTree is
    end TestGetAncestorsCount;
 
    procedure TestGetAncestorsByGeneration is
-      -- Déclaration des arbres
-      Tree1 : T_FamilyTree;
       AncestorsResult : TreeVector.Vector;
       ExpectedAncestors : TreeVector.Vector;
+      Family : T_FamilyTree;
    begin
-      -- Créer un arbre ordinaire pour les tests
-      Tree1 := createOrdinaryFamilyTree;
+      Family := createOrdinaryFamilyTree;
+      -- ##########################################################
+      -- Test 1: Génération 1 depuis la clé 1
+      -- ##########################################################
+      Put_Line("Test 1: Ancêtres génération 1 (clé 1)");
+      
+      -- Résultat attendu : [2, 3]
+      ExpectedAncestors.Append(getFamilyNode(Family, 2));
+      ExpectedAncestors.Append(getFamilyNode(Family, 3));
+      
+      AncestorsResult := getAncestorsByGeneration(Family, 1, 1);
+      
+      pragma Assert(AncestorsResult = ExpectedAncestors, 
+                   "Test 1 échoué : Mauvais parents directs");
+      Put_Line("Test 1 réussi ✓");
+      ExpectedAncestors.Clear;
 
-      Put_Line("");
-      Put_Line("---- Tests TestGetAncestorsByGeneration... ----");
-      Put_Line("");
+      -- ##########################################################
+      -- Test 2: Génération 2 depuis la clé 1
+      -- ##########################################################
+      Put_Line("Test 2: Ancêtres génération 2 (clé 1)");
+      
+      -- Résultat attendu : [4]
+      ExpectedAncestors.Append(getFamilyNode(Family, 4));
+      
+      AncestorsResult := getAncestorsByGeneration(Family, 1, 2);
+      
+      pragma Assert(AncestorsResult = ExpectedAncestors and getLength(AncestorsResult) = 1, 
+                   "Test 2 échoué : Mauvais grands-parents");
+      Put_Line("Test 2 réussi ✓");
+      ExpectedAncestors.Clear;
 
-      -- Test 1: Obtenir les ancêtres de la génération 1 d'un nœud (clé 1)
-      Put_Line("Test 1: Obtenir les ancêtres de la génération 1 du nœud (clé 1)...");
+      -- ##########################################################
+      -- Test 3: Génération 3 depuis la clé 1
+      -- ##########################################################
+      Put_Line("Test 3: Ancêtres génération 3 (clé 1)");
+      
+      -- Résultat attendu : [5]
+      ExpectedAncestors.Append(getFamilyNode(Family, 5));
+      
+      AncestorsResult := getAncestorsByGeneration(Family, 1, 3);
+      
+      pragma Assert(AncestorsResult = ExpectedAncestors, 
+                   "Test 3 échoué : Mauvais arrière-grand-parent");
+      Put_Line("Test 3 réussi ✓");
+      ExpectedAncestors.Clear;
 
-      -- On cherche les ancêtres du nœud avec la clé 1 à la génération 1
-      AncestorsResult := getAncestorsByGeneration(Tree1, 1, 1);
+      -- ##########################################################
+      -- Test 4: Clé invalide
+      -- ##########################################################
+      Put_Line("Test 4: Clé inexistante (999)");
+      AncestorsResult := getAncestorsByGeneration(Family, 999, 1);
+      pragma Assert(AncestorsResult.Is_Empty, 
+                   "Test 4 échoué : Résultat devrait être vide");
+      Put_Line("Test 4 réussi ✓");
 
-      -- Définir les ancêtres attendus pour ce test
-      ExpectedAncestors := getFamilyNode(Tree1, 2) & getFamilyNode(Tree1, 3); -- Ici, clé 3 et clé 2 sont les ancêtres de génération 1
-
-      -- Vérifier que les ancêtres obtenus sont corrects
-      pragma Assert(AncestorsResult = ExpectedAncestors, "Test 1 échoué: Les ancêtres obtenus ne correspondent pas à la génération 1.");
-
-      Put_Line("Test 1 réussi: Les ancêtres de la génération 1 ont été obtenus correctement.");
-
-      -- Test 2: Obtenir les ancêtres de la génération 2 du nœud (clé 5)
-      Put_Line("Test 2: Obtenir les ancêtres de la génération 2 du nœud (clé 1)...");
-
-      -- On cherche les ancêtres du nœud avec la clé 5 à la génération 2
-      AncestorsResult := getAncestorsByGeneration(Tree1, 1, 2);
-
-      -- Définir les ancêtres attendus pour ce test
-      ExpectedAncestors := getFamilyNode(Tree1, 4) & getFamilyNode(Tree1, 5); -- Ici, les clés 4 et 5 sont les ancêtres de génération 2
-
-      -- Vérifier que les ancêtres obtenus sont corrects
-      pragma Assert(AncestorsResult = ExpectedAncestors, "Test 2 échoué: Les ancêtres obtenus ne correspondent pas à la génération 2.");
-
-      Put_Line("Test 2 réussi: Les ancêtres de la génération 2 ont été obtenus correctement.");
-
-      -- Test 3: Vérifier un cas où il n'y a pas d'ancêtres à la génération 3 pour un nœud (clé 5)
-      Put_Line("Test 3: Vérifier les ancêtres de la génération 3 pour un nœud (clé 5)...");
-
-      -- On cherche les ancêtres du nœud avec la clé 5 à la génération 3
-      AncestorsResult := getAncestorsByGeneration(Tree1, 5, 3);
-
-      -- Définir les ancêtres attendus pour ce test (aucun dans ce cas)
-      ExpectedAncestors := TreeVector.Empty_Vector;
-
-      -- Vérifier que le résultat est vide
-      pragma Assert(AncestorsResult = ExpectedAncestors, "Test 3 échoué: Aucune ancêtre à la génération 3, mais des ancêtres ont été trouvés.");
-
-      Put_Line("Test 3 réussi: Aucun ancêtre à la génération 3 n'a été trouvé.");
-
+      -- ##########################################################
+      -- Test 5: Génération négative
+      -- ##########################################################
+      Put_Line("Test 5: Génération négative (-5)");
+      AncestorsResult := getAncestorsByGeneration(Family, 1, -5);
+      pragma Assert(AncestorsResult.Is_Empty, 
+                   "Test 5 échoué : Résultat devrait être vide");
+      Put_Line("Test 5 réussi ✓");
+      
    end TestGetAncestorsByGeneration;
 
    procedure TestGetSingleParentIndividuals is

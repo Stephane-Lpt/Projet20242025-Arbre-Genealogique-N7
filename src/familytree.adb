@@ -41,50 +41,51 @@ package body FamilyTree is
    end getAncestorsCount;
 
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
-   function getAncestorsByGeneration (ABR : in T_BinaryTree; 
-                                   Key : in Integer; 
-                                   Generation : in Integer) return TreeVector.Vector is
-   -- A vector to store the ancestors at the specified generation
-   Ancestors : TreeVector.Vector := TreeVector.Empty_Vector;
-   Stop : Boolean := False;
-   
-   -- Find the node with the given Key
-   NodeToFind : T_FamilyTree := getNode(ABR, Key);
+   function getAncestorsByGeneration (ABR : in T_FamilyTree; 
+                                    Key : in Integer; 
+                                    Generation : in Integer) return TreeVector.Vector is
 
-   -- A helper procedure to process each ancestor during the traversal
-   procedure processAncestor (ABR : in out T_BinaryTree; 
-                              Parent : in out T_BinaryTree; 
-                              Stop : in out Boolean) is
-      GenLevel : Integer := 0;
+      TargetABR : constant T_FamilyTree := getFamilyNode(ABR, Key);
+
+      -- Fonction helper récursive pour collecter les ancêtres à la génération cible
+      function Helper (ABR : T_FamilyTree; CurrentGen : Integer) return TreeVector.Vector is
+         Result : TreeVector.Vector;
       begin
-         if isEmpty(ABR) or else Stop then
-            return;
+         if IsNull(ABR) then
+            return Result;  -- Fin de branche
          end if;
 
-         -- If we are at the target generation level, add the ancestor to the vector
-         if GenLevel = Generation then
-            -- Add ABR to Ancestors (you may need to define how TreeVector works)
-            Ancestors.append(ABR);
-            Stop := True;  -- Stop further traversal after finding the generation
+         -- Si on a atteint la génération cible
+         if CurrentGen = Generation then
+            Result.Append(ABR);  -- Ajouter le nœud courant
+            return Result;
          end if;
 
-         -- Continue the traversal upward if we are not yet at the desired generation
-         if GenLevel < Generation then
-            GenLevel := GenLevel + 1;
-         end if;
+         -- Explorer récursivement les deux parents avec génération+1
+         declare
+            LeftResult  : constant TreeVector.Vector := Helper(getLeftChild(ABR), CurrentGen + 1);
+            RightResult : constant TreeVector.Vector := Helper(getRightChild(ABR), CurrentGen + 1);
+         begin
+            -- Fusionner les résultats
+            for E of LeftResult loop
+               Result.Append(E);
+            end loop;
+            for E of RightResult loop
+               Result.Append(E);
+            end loop;
+         end;
 
-      end processAncestor;
+         return Result;
+      end Helper;
 
    begin
-      -- Check if the node to find exists
-      if isEmpty(NodeToFind) then
-         return Ancestors;  -- Return empty vector if node not found
+      -- Gestion des cas d'erreur
+      if IsNull(TargetABR) or Generation < 0 then
+         return TreeVector.Empty_Vector;
       end if;
 
-      -- Traverse the tree and apply the processAncestor procedure
-      traverseTreeAndApply(ABR, Parent => null, ActionCallback => processAncestor, Stop => Stop);
-
-      return Ancestors;
+      -- Démarrer la récursion depuis le nœud cible (génération 0)
+      return Helper(TargetABR, 0);
    end getAncestorsByGeneration;
 
    -- Afficher l’arbre.
@@ -132,5 +133,16 @@ package body FamilyTree is
    begin
       return getNode(ABR, Key);
    end getFamilyNode;
+
+   function IsNull (ABR : in T_FamilyTree) return Boolean is
+   begin
+      return isEmpty(ABR);
+   end IsNull;
+
+   function getLength(Vector: TreeVector.Vector) return Integer is
+   begin
+      return Integer(Vector.Length);
+   end getLength;
+
 
 end FamilyTree;
