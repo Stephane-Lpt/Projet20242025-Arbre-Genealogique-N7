@@ -233,6 +233,11 @@ package body BinaryTree is
       ABR.Right := Child;
    end setRightChild;
 
+   function getElement (ABR : T_BinaryTree) return T_Element is
+   begin
+      return ABR.Element;
+   end getElement;
+
 
 
 

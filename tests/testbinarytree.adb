@@ -1,5 +1,4 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with FamilyTree;
 with Utils; use Utils;
 with BinaryTree; 
 
@@ -36,45 +35,89 @@ procedure TestBinaryTree is
       return Tree1;
    end createOrdinaryTree;
 
-
    -- TEST isEmpty --
    procedure TestIsEmpty is
       Tree1, Tree2 : T_BinaryTree;
    begin
-      initTree(Tree1);
+      Put_Line("");
+      Put_Line("---- Tests isEmpty ----");
+      Put_Line("");
 
+      initTree(Tree1);
       initRoot(Tree2, 1, 1);
 
-      pragma Assert (isEmpty(Tree1));
-      pragma Assert (not isEmpty(Tree2));
+      Put_Line("Test 1: Vérification de l'initialisation d'un arbre vide");
+      pragma Assert (isEmpty(Tree1), "Échec: Tree1 devrait être vide");
+      Put_Line("Succès: Tree1 correctement initialisé vide");
+
+      Put_Line("Test 2: Vérification d'un arbre avec racine");
+      pragma Assert (not isEmpty(Tree2), "Échec: Tree2 ne devrait pas être vide");
+      Put_Line("Succès: Tree2 correctement initialisé avec une racine");
    end TestIsEmpty;
+
 
    -- TEST addNode --
    procedure TestAddNode is
-      RootTree, LeftTree, RightTree : T_BinaryTree;
+      RootTree, LeftTree, RightTree, SubTree, NewChild : T_BinaryTree;
    begin
+      Put_Line("");
+      Put_Line("---- Tests addNode ----");
+      Put_Line("");
+
+      -- Initialisation de la racine et des enfants
+      Put_Line("Initialisation de la racine (clé 1)");
       initRoot(RootTree, 1, 12);
       initRoot(LeftTree, 2, 82);
       initRoot(RightTree, 3, 23);
 
+      Put_Line("Ajout des enfants gauche et droit à la racine");
       addNode(RootTree, LeftTree, 1, LEFT);
       addNode(RootTree, RightTree, 1, RIGHT);
 
-      -- not working!
-      --pragma Assert(RootTree.all.Left.all = LeftTree);
-      --pragma Assert(RootTree.all.Right.all = RightTree);
-      --pragma Assert(RootTree.all.Left.Key = 2);
-      --pragma Assert(RootTree.all.Right.Key = 3);
-      --pragma Assert(RootTree.Left.all.Element = 82);
-      --pragma Assert(RootTree.Right.all.Element = 23);
+      Put_Line("Vérification des enfants de la racine");
+      pragma Assert(getLeftChild(RootTree) = LeftTree, "Erreur: Enfant gauche non trouvé");
+      pragma Assert(getRightChild(RootTree) = RightTree, "Erreur: Enfant droit non trouvé");
+      pragma Assert(getKey(getLeftChild(RootTree)) = 2, "Erreur: Clé de l'enfant gauche incorrecte");
+      pragma Assert(getElement(getLeftChild(RootTree)) = 82, "Erreur: Valeur de l'enfant gauche incorrecte");
+      pragma Assert(getKey(getRightChild(RootTree)) = 3, "Erreur: Clé de l'enfant droit incorrecte");
+      pragma Assert(getElement(getRightChild(RootTree)) = 23, "Erreur: Valeur de l'enfant droit incorrecte");
+      Put_Line("Succès: Enfants de la racine vérifiés");
 
-      -- TODO: add tests with ID's that aren't directly the ABR's root (need to implement getNode)
+      -- Ajout à un nœud interne 
+      Put_Line("Récupération du sous-arbre gauche (clé 2)");
+      SubTree := getNode(RootTree, 2); 
+
+      Put_Line("Ajout d'un enfant gauche au sous-arbre");
+      initRoot(NewChild, 4, 45);
+      addNode(SubTree, NewChild, 2, LEFT);
+
+      Put_Line("Vérification de l'ajout");
+      pragma Assert(getLeftChild(SubTree) = NewChild, "Erreur: Enfant gauche non ajouté au sous-arbre");
+      pragma Assert(getKey(getLeftChild(SubTree)) = 4, "Erreur: Clé de l'enfant gauche incorrecte");
+      pragma Assert(getElement(getLeftChild(SubTree)) = 45, "Erreur: Valeur de l'enfant gauche incorrecte");
+      Put_Line("Succès: Enfant gauche ajouté au sous-arbre");
+
+      -- Ajout d'un enfant droit
+      Put_Line("Ajout d'un enfant droit au sous-arbre");
+      initRoot(NewChild, 5, 99);
+      addNode(SubTree, NewChild, 2, RIGHT);
+
+      Put_Line("Vérification de l'ajout");
+      pragma Assert(getRightChild(SubTree) = NewChild, "Erreur: Enfant droit non ajouté au sous-arbre");
+      pragma Assert(getKey(getRightChild(SubTree)) = 5, "Erreur: Clé de l'enfant droit incorrecte");
+      pragma Assert(getElement(getRightChild(SubTree)) = 99, "Erreur: Valeur de l'enfant droit incorrecte");
+      Put_Line("Succès: Enfant droit ajouté au sous-arbre");
    end TestAddNode;
+
 
    -- TEST isPresent --
    procedure TestIsPresent is
       RootTree, Tree1, Tree2 : T_BinaryTree;
    begin
+      Put_Line("");
+      Put_Line("---- Tests isPresent ----");
+      Put_Line("");
+
       initRoot(RootTree, 1, 12);
       initRoot(Tree1, 2, 97);
       initRoot(Tree2, 3, 78);
@@ -82,44 +125,62 @@ procedure TestBinaryTree is
       addNode (RootTree, Tree1, 1, LEFT);
       addNode (Tree1, Tree2, 2, RIGHT);
 
-      pragma Assert (isPresent (RootTree, 1));
-      pragma Assert (isPresent (RootTree, 2));
-      pragma Assert (isPresent (RootTree, 3));
-      pragma Assert (not isPresent (RootTree, 4));
+      Put_Line("Vérification des clés existantes");
+      pragma Assert (isPresent (RootTree, 1), "Erreur: Racine (clé 1) non trouvée");
+      pragma Assert (isPresent (RootTree, 2), "Erreur: Enfant gauche (clé 2) non trouvé");
+      pragma Assert (isPresent (RootTree, 3), "Erreur: Enfant droit (clé 3) non trouvé");
+      Put_Line("Succès: Toutes les clés existantes sont présentes");
+
+      Put_Line("Vérification d'une clé absente");
+      pragma Assert (not isPresent (RootTree, 4), "Erreur: Clé 4 trouvée dans l'arbre");
+      Put_Line("Succès: Clé absente correctement identifiée");
    end TestIsPresent;
+
 
    -- TEST getSize --
    procedure TestGetSize is
       Tree1, Tree2, Tree3, Tree4, Tree5 : T_BinaryTree;
    begin
+      Put_Line("");
+      Put_Line("---- Tests getSize ----");
+      Put_Line("");
+
+      Put_Line("Test sur arbre vide");
       initTree (Tree1);
+      pragma Assert (getSize (Tree1) = 0, "Erreur: Taille de l'arbre vide non nulle");
+      Put_Line("Succès: Taille de l'arbre vide correcte");
 
-      pragma Assert (getSize (Tree1) = 0);
-
+      Put_Line("Test avec racine uniquement");
       initRoot(Tree1, 1, 12);
+      pragma Assert (getSize (Tree1) = 1, "Erreur: Taille de l'arbre avec racine incorrecte");
+      Put_Line("Succès: Taille après ajout de la racine correcte");
+
+      Put_Line("Test après ajout de deux enfants");
       initRoot(Tree2, 2, 97);
       initRoot(Tree3, 3, 78);
-      initRoot(Tree4, 4, 34);
-      initRoot(Tree5, 5, 90);
-
-      pragma Assert (getSize (Tree1) = 1);
-
       addNode (Tree1, Tree2, 1, LEFT);
       addNode (Tree1, Tree3, 1, RIGHT);
+      pragma Assert (getSize (Tree1) = 3, "Erreur: Taille après ajout des enfants incorrecte");
+      Put_Line("Succès: Taille après ajout des enfants correcte");
 
-      pragma Assert (getSize (Tree1) = 3);
-
+      Put_Line("Test après ajout de deux petits-enfants");
+      initRoot(Tree4, 4, 34);
+      initRoot(Tree5, 5, 90);
       addNode (Tree2, Tree4, 2, LEFT);
       addNode (Tree3, Tree5, 3, RIGHT);
-
-      pragma Assert (getSize (Tree1) = 5);
-      pragma Assert (getSize (Tree2) = 2);
-      pragma Assert (getSize (Tree5) = 1);
+      pragma Assert (getSize (Tree1) = 5, "Erreur: Taille après ajout des petits-enfants incorrecte");
+      Put_Line("Succès: Taille finale de l'arbre correcte");
    end TestGetSize;
 
+
+   -- TEST getNode --
    procedure TestGetNode is
       Tree1, Tree2, Tree3, Tree4, Tree5, FoundRootTree, FoundChildTree, NotFoundTree : T_BinaryTree;
    begin
+      Put_Line("");
+      Put_Line("---- Tests getNode ----");
+      Put_Line("");
+
       initRoot(Tree1, 1, 10);
       initRoot(Tree2, 2, 20);
       initRoot(Tree3, 3, 30);
@@ -131,19 +192,20 @@ procedure TestBinaryTree is
       addNode(Tree3, Tree4, 3, LEFT);
       addNode(Tree4, Tree5, 4, RIGHT);
 
-
-      -- ROOT
+      Put_Line("Recherche de la racine (clé 1)");
       FoundRootTree := getNode(Tree1, 1);
-      pragma Assert (FoundRootTree = Tree1);
+      pragma Assert (FoundRootTree = Tree1, "Erreur: Racine non trouvée");
+      Put_Line("Succès: Racine trouvée");
 
-      -- CHILD
+      Put_Line("Recherche d'un nœud enfant (clé 3)");
       FoundChildTree := getNode(Tree1, 3);
-      pragma Assert (FoundChildTree = Tree3);
+      pragma Assert (FoundChildTree = Tree3, "Erreur: Nœud enfant non trouvé");
+      Put_Line("Succès: Nœud enfant trouvé");
 
-      -- NON-EXISTENT
+      Put_Line("Recherche d'un nœud inexistant (clé 6)");
       NotFoundTree := getNode(Tree1, 6);
-      pragma Assert (isEmpty(NotFoundTree));
-
+      pragma Assert (isEmpty(NotFoundTree), "Erreur: Un nœud inexistant a été retourné");
+      Put_Line("Succès: Nœud inexistant non trouvé");
    end TestGetNode;
 
 procedure TestTraverseTreeAndApply is
