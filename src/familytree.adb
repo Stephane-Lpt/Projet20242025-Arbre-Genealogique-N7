@@ -4,13 +4,30 @@ with utils;               use utils;
 
 package body FamilyTree is
 
+   function isEmpty(ABR : in T_FamilyTree) return Boolean is
+   begin
+      return Tree.isEmpty (ABR);
+   end isEmpty;
+
+   function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean is
+   begin
+      return Tree.isPresent (ABR, Key);
+   end isPresent;
+
    procedure initFamilyTree(ABR : out T_FamilyTree) is
    begin
       initTree(ABR);
    end initFamilyTree;
 
+   function getEmptyFamilyTree return T_FamilyTree is
+      Tree : T_FamilyTree;
+   begin
+      initFamilyTree (Tree);
+      return Tree;
+   end getEmptyFamilyTree;
+
    -- 1. Créer un arbre minimal contenant le seul nœud racine, sans père ni mère.
-   procedure initChild(ABR : out T_BinaryTree; Key: in Integer; Person : in T_Person) is
+   procedure initChild(ABR : out T_FamilyTree; Key: in Integer; Person : in T_Person) is
    begin
       initRoot (ABR, Key, Person);
    end initChild;
@@ -41,19 +58,19 @@ package body FamilyTree is
    end getAncestorsCount;
 
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
-   function getAncestorsByGeneration (ABR : in T_BinaryTree; 
-                                   Key : in Integer; 
+   function getAncestorsByGeneration (ABR : in T_BinaryTree;
+                                   Key : in Integer;
                                    Generation : in Integer) return TreeVector.Vector is
    -- A vector to store the ancestors at the specified generation
    Ancestors : TreeVector.Vector := TreeVector.Empty_Vector;
    Stop : Boolean := False;
-   
+
    -- Find the node with the given Key
    NodeToFind : T_FamilyTree := getNode(ABR, Key);
 
    -- A helper procedure to process each ancestor during the traversal
-   procedure processAncestor (ABR : in out T_BinaryTree; 
-                              Parent : in out T_BinaryTree; 
+   procedure processAncestor (ABR : in out T_BinaryTree;
+                              Parent : in out T_BinaryTree;
                               Stop : in out Boolean) is
       GenLevel : Integer := 0;
       begin
@@ -82,31 +99,38 @@ package body FamilyTree is
       end if;
 
       -- Traverse the tree and apply the processAncestor procedure
-      traverseTreeAndApply(ABR, Parent => null, ActionCallback => processAncestor, Stop => Stop);
+      --traverseTreeAndApply(ABR, Parent => null, ActionCallback => processAncestor, Stop => Stop);
 
       return Ancestors;
    end getAncestorsByGeneration;
 
    -- Afficher l’arbre.
-   procedure showFamilyTree (ABR : in T_BinaryTree; Verbosity : in Integer := 1) is
+   procedure showFamilyTree (ABR : in T_FamilyTree; Verbosity : in Integer := 1) is
    begin
       showTree (ABR => ABR, PropToShow => Elements, Verbosity => Verbosity);
    end showFamilyTree;
 
    -- 5. Afficher l’arbre à partir d’un nœud donné.
-   procedure showFamilyTreeFromId (ABR : in T_BinaryTree; Key : in Integer; Verbosity : in Integer := 1) is
+   procedure showFamilyTreeFromId (ABR : in T_FamilyTree; Key : in Integer; Verbosity : in Integer := 1) is
    begin
       showFamilyTree (ABR => getNode(ABR, Key), Verbosity => Verbosity);
    end showFamilyTreeFromId;
 
-   -- 7. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
+   -- 7. Obtenir l’ensemble des individus qui n’ont pas de parents connus.
+   function getOrphanIndividuals (ABR : in T_FamilyTree; Key : in Integer) return TreeVector.Vector is
+       OrphanIndividuals : TreeVector.Vector;
+   begin
+      return OrphanIndividuals;
+   end getOrphanIndividuals;
+
+   -- 8. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector is
        SingleParentIndividuals : TreeVector.Vector;
    begin
       return SingleParentIndividuals;
    end getSingleParentIndividuals;
 
-   -- 8. Obtenir l’ensemble des individus dont les deux parents sont connus.
+   -- 9. Obtenir l’ensemble des individus dont les deux parents sont connus.
    function getDualParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector is
       DualParentIndividuals : TreeVector.Vector;
    begin
@@ -114,8 +138,8 @@ package body FamilyTree is
    end getDualParentIndividuals;
 
    -- Getters
-   --function 
-   
+   --function
+
    function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree is
    begin
       case Position is
