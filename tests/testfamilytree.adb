@@ -31,8 +31,54 @@ procedure TestFamilyTree is
    end TestGetGenerationsCount;
 
    procedure TestGetAncestorsCount is
+      Family : T_FamilyTree;
    begin 
-      Null;
+      Family := createOrdinaryFamilyTree;
+
+         Put_Line("");
+         Put_Line("---- Tests GetAncestorsCount... ----");
+         Put_Line("");
+
+
+      -- ##########################################################
+      Put_Line("Test 1: Comptage ancêtres racine (clé 1)");
+      pragma Assert(
+         getAncestorsCount(Family, 1) = 5,
+         "Échec Test 1: Devrait retourner 5 ancêtres (1+2+3+4+5)"
+      );
+      Put_Line("✓ Test 1 réussi");
+
+      -- ##########################################################
+      Put_Line("Test 2: Comptage sous-arbre mère (clé 3)");
+      pragma Assert(
+         getAncestorsCount(Family, 3) = 3,
+         "Échec Test 2: Devrait retourner 3 ancêtres (3+4+5)"
+      );
+      Put_Line("✓ Test 2 réussi");
+
+      -- ##########################################################
+      Put_Line("Test 3: Feuille de l'arbre (clé 5)");
+      pragma Assert(
+         getAncestorsCount(Family, 5) = 1,
+         "Échec Test 3: Devrait retourner 1 (nœud seul)"
+      );
+      Put_Line("✓ Test 3 réussi");
+
+      -- ##########################################################
+      Put_Line("Test 4: Branche vide (clé 2)");
+      pragma Assert(
+         getAncestorsCount(Family, 2) = 1,
+         "Échec Test 4: Devrait retourner 1 (père sans ascendants)"
+      );
+      Put_Line("✓ Test 4 réussi");
+
+      -- ##########################################################
+      Put_Line("Test 5: Clé invalide");
+      pragma Assert(
+         getAncestorsCount(Family, 999) = 0,
+         "Échec Test 5: Devrait retourner 0 pour clé inexistante"
+      );
+      Put_Line("✓ Test 5 réussi");
    end TestGetAncestorsCount;
 
    procedure TestGetAncestorsByGeneration is
@@ -41,6 +87,9 @@ procedure TestFamilyTree is
       Family : T_FamilyTree;
    begin
       Family := createOrdinaryFamilyTree;
+      Put_Line("");
+      Put_Line("---- Tests GetAncestorsByGeneration... ----");
+      Put_Line("");
       -- ##########################################################
       -- Test 1: Génération 1 depuis la clé 1
       -- ##########################################################
@@ -119,7 +168,7 @@ procedure TestFamilyTree is
 
 begin
    -- TestGetGenerationsCount;
-   -- TestGetAncestorsCount;
+   TestGetAncestorsCount;
    TestGetAncestorsByGeneration;
    -- TestGetSingleParentIndividuals;
    -- TestGetDualParentIndividuals;

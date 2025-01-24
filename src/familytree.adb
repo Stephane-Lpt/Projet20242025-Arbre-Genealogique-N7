@@ -35,9 +35,15 @@ package body FamilyTree is
 
    -- 3. Obtenir le nombre d’ancêtres connus (lui compris) d’un individu donné
    function getAncestorsCount
-     (ABR : in T_BinaryTree; Key : in Integer) return Integer is
+   (ABR : in T_FamilyTree; Key : in Integer) return Integer 
+   is
+      Node : constant T_FamilyTree := getFamilyNode(ABR, Key);
    begin
-      return 0;
+      if IsNull(Node) then
+         return 0;
+      else
+         return getSize(Node); -- Utilise la fonction getSize existante du BinaryTree
+      end if;
    end getAncestorsCount;
 
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
