@@ -29,8 +29,24 @@ package body FamilyTree is
 
    -- Renvoie le nombre de générations dans un arbre donné
    function getGenerationsCount (ABR : in T_BinaryTree) return Integer is
+      function Max_Depth(Node : T_BinaryTree) return Integer is
+         Left_Depth  : Integer := 0;
+         Right_Depth : Integer := 0;
+      begin
+         if IsNull(Node) then
+            return 0;
+         else
+            -- Calcul récursif des profondeurs gauche/droite
+            Left_Depth  := Max_Depth(getLeftChild(Node));
+            Right_Depth := Max_Depth(getRightChild(Node));
+            
+            -- Retourne la profondeur max + 1 (niveau courant)
+            return 1 + Integer'Max(Left_Depth, Right_Depth);
+         end if;
+      end Max_Depth;
+
    begin
-      return 0;
+      return Max_Depth(ABR);
    end getGenerationsCount;
 
    -- 3. Obtenir le nombre d’ancêtres connus (lui compris) d’un individu donné
@@ -145,6 +161,11 @@ package body FamilyTree is
    begin
       return Integer(Vector.Length);
    end getLength;
+
+   procedure clean (ABR : in out T_FamilyTree) is
+   begin
+      Tree.clean(ABR); -- Appel à la version générique
+   end clean;
 
 
 end FamilyTree;

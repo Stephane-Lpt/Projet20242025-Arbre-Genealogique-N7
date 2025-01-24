@@ -26,8 +26,76 @@ procedure TestFamilyTree is
    end createOrdinaryFamilyTree;
 
    procedure TestGetGenerationsCount is
-   begin 
-      Null;
+      TestTree : T_FamilyTree;
+      TempTree : T_FamilyTree;
+
+
+      function Create_Complex_Tree return T_FamilyTree is
+         FT : T_FamilyTree;
+      begin
+         initChild(FT, 1, initPersonObj);
+         addAncestor(FT, 1, RIGHT, 3, initPersonObj);
+         addAncestor(FT, 3, LEFT, 4, initPersonObj);
+         addAncestor(FT, 4, RIGHT, 5, initPersonObj);
+         return FT;
+      end Create_Complex_Tree;
+   begin
+      Put_Line("");
+      Put_Line("---- Tests GetGenerationsCount... ----");
+      Put_Line("");
+      -- ##########################################################
+      Put_Line("Test 1: Arbre vide");
+      initFamilyTree (TestTree);
+      pragma Assert(
+         getGenerationsCount(TestTree) = 0, 
+         "Échec Test 1 - Resultat: " & Integer'Image(getGenerationsCount(TestTree))
+      );
+      Put_Line("✓ Test 1 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 2: Arbre à 1 nœud");s
+      initChild(TestTree, 1, initPersonObj);
+      pragma Assert(
+         getGenerationsCount(TestTree) = 1,
+         "Échec Test 2 - Resultat: " & Integer'Image(getGenerationsCount(TestTree))
+      );
+      Put_Line("✓ Test 2 réussi");
+      clean(TestTree);
+   
+
+      -- ##########################################################
+      Put_Line("Test 3: Arbre à 2 générations");
+      initChild(TestTree, 1, initPersonObj);
+      addAncestor(TestTree, 1, LEFT, 2, initPersonObj);
+      pragma Assert(
+         getGenerationsCount(TestTree) = 2,
+         "Échec Test 3 - Resultat: " & Integer'Image(getGenerationsCount(TestTree))
+      );
+      Put_Line("✓ Test 3 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 4: Arbre complexe (4 générations)");
+      TestTree := Create_Complex_Tree;
+      pragma Assert(
+         getGenerationsCount(TestTree) = 4,
+         "Échec Test 4 - Resultat: " & Integer'Image(getGenerationsCount(TestTree))
+      );
+      Put_Line("✓ Test 4 réussi");
+
+      -- ##########################################################
+      Put_Line("Test 5: Arbre déséquilibré gauche");
+      initChild(TempTree, 10, initPersonObj);
+      addAncestor(TempTree, 10, LEFT, 20, initPersonObj);
+      addAncestor(TempTree, 20, LEFT, 30, initPersonObj);
+      pragma Assert(
+         getGenerationsCount(TempTree) = 3,
+         "Échec Test 5 - Resultat: " & Integer'Image(getGenerationsCount(TempTree))
+      );
+      Put_Line("✓ Test 5 réussi");
+      clean(TempTree);
+
    end TestGetGenerationsCount;
 
    procedure TestGetAncestorsCount is
@@ -167,7 +235,7 @@ procedure TestFamilyTree is
    end TestGetDualParentIndividuals;
 
 begin
-   -- TestGetGenerationsCount;
+   TestGetGenerationsCount;
    TestGetAncestorsCount;
    TestGetAncestorsByGeneration;
    -- TestGetSingleParentIndividuals;

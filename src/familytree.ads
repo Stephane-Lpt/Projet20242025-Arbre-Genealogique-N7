@@ -25,8 +25,7 @@ package FamilyTree is
    -- 1. Créer un arbre minimal contenant le seul nœud racine, sans père ni mère.
    procedure initChild
      (ABR : out T_FamilyTree; Key: in Integer; Person : in T_Person) with
-     Post =>
-      getGenerationsCount (ABR) = 0; -- SHOULD HAVE ONE SINGLE GENERATION
+     Post => getGenerationsCount (ABR) = 1; -- SHOULD HAVE ONE SINGLE GENERATION
 
    procedure addAncestor (ABR : in out T_FamilyTree; TargetKey : in Integer; Position : in T_Position; NewKey : in Integer; NewPerson: in T_Person);
 
@@ -62,6 +61,8 @@ package FamilyTree is
    function IsNull (ABR : in T_FamilyTree) return Boolean;
 
    function getLength(Vector: TreeVector.Vector) return Integer;
+
+   procedure clean (ABR : in out T_FamilyTree);
 
 
 end FamilyTree;
