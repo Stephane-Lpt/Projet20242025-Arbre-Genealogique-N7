@@ -28,9 +28,9 @@ jobs:
     # Étape 4 : Exécution des tests
     - name: Run Tests
       run: |
-        if [ -f "${{ github.workspace }}/build/bin/testfamilytree" ]; then
-          chmod +x "${{ github.workspace }}/build/bin/testfamilytree"
-          "${{ github.workspace }}/build/bin/testfamilytree"
+        if [ -f "build/bin/testfamilytree" ]; then
+          chmod +x "build/bin/testfamilytree"
+          "build/bin/testfamilytree"
         else
           echo "Test binary not found!"
           exit 1
