@@ -49,6 +49,8 @@ procedure Menu is
 
     OperationAbandonnedException : exception;
 
+    
+    TreeMenuChoice : aliased Unbounded_String;
     procedure TreeMenu is
         procedure HandleAddAncestor is
         begin
@@ -108,13 +110,15 @@ procedure Menu is
             Put_Line ("1. Afficher l'arbre avec la verbosité " & getTrimmedInt(Verbosity));
             Put_Line ("2. Afficher l'arbre à partir d'un noeud donne");
             Put_Line ("3. Ajouter un ancêtre");
-            Put_Line ("5. Supprimer un ancêtre");
-            Put_Line ("6. Obtenir le nombre d'ancêtres connus d'un individu");
-            Put_Line ("7. Obtenir l'ensemble des ancêtres de generation N d'un individu");
-            Put_Line ("8. Obtenir les individus sans parents connus");
-            Put_Line ("9. Obtenir les individus avec un seul parent connu");
-            Put_Line ("10. Obtenir les individus avec deux parents");
-
+            Put_Line ("4. Supprimer un ancêtre");
+            Put_Line ("5. Obtenir le nombre d'ancêtres connus d'un individu");
+            Put_Line ("6. Obtenir l'ensemble des ancêtres de generation N d'un individu");
+            Put_Line ("7. Obtenir les individus sans parents connus");
+            Put_Line ("8. Obtenir les individus avec un seul parent connu");
+            Put_Line ("9. Obtenir les individus avec deux parents");
+            
+            begin
+                HandleInput
             New_Line;
             Put ("Entrez votre choix (1-11) : ");
             Get (Item => Choice);
@@ -123,9 +127,9 @@ procedure Menu is
                 when 1 =>
                     showFamilyTree (CurrentTree.Tree, Verbosity);
                 when 2 =>
-                    HandleModifyAncestor;
+                    Null;
                 when 3 =>
-                    HandleDeleteAncestor;
+                    HandleAddAncestor;
                 when 4 =>
                     HandleGetAncestorsCount;
                 when 5 =>
@@ -147,16 +151,25 @@ procedure Menu is
 
     end TreeMenu;
     
-    procedure HandleInput(Pointer : in String_Access; TextString : in String; InputType : in T_InputType := STR; MaxInt : in Integer := -1) is
+    procedure HandleInput(Pointer : in String_Access; TextString : in String; InputType : in T_InputType := STR; MaxInt : in Integer := -1; CheckKeyPresence : Boolean := False; KeyMustBePresent : Boolean := False) is
         -- GET IMPUT FROM USER
         -- Pointer : pointer to the string that is going to be modified
         -- TextString : Input prompt string 
-        -- InputType : Expected input type from user (either string or integer)
+        -- InputType : Expected input type from user (either string or integer or key)
         -- MaxInt : Maximum int that can be entered by user
+        -- CheckKeyPresence : decide whether to check if key is present / absent in currenttree or not
+        -- KeyMustBePresent : decide whether the key has to be absent or present in currenttree
         ExitInput : Boolean := False;
         ShowTextString : Boolean := True;
         Input : Unbounded_String;
         TempInt : Integer;
+
+        procedure HandleException(ErrorText : in String) is 
+        begin
+            New_Line;
+            Put(getColoredString(ErrorText, ERROR));
+            ShowTextString := False;
+        end HandleException;
     begin
         while not ExitInput loop
             begin
@@ -169,14 +182,30 @@ procedure Menu is
                 if Input = QuitCharacter then
                     raise OperationAbandonnedException;
                 else
-                    if InputType = INT then
-                        --  IN CASE WHEN ASKED FOR AN INTEGER, CHECKING IF IT'S A VALID INT
-                        TempInt := Integer'Value(To_String(Input));
-                    end if;
+                    --  IN CASE WHEN ASKED FOR AN INTEGER, CHECKING IF IT'S A VALID INT
+                    TempInt := (if (InputType = INT or InputType = KEY) then Integer'Value(To_String(Input)) else -1);
 
-                    -- ALSO CHECKING IF IT FALLS IN THE 1 .. MaxInt RANGE (only if MaxInt isn't the default value, -1)
-                    if MaxInt /= -1 and (TempInt <= 0 or TempInt > MaxInt) then
-                        raise Data_Error;
+                    if InputType = INT then
+                        -- CHECKING IF INT FALLS IN THE 1 .. MaxInt RANGE (only if MaxInt isn't the default value, -1)
+                        if MaxInt /= -1 and (TempInt <= 0 or TempInt > MaxInt) then
+                            raise Data_Error;
+                        end if;
+                    elsif InputType = KEY then
+                        if CheckKeyPresence then
+                            declare 
+                                Tree: T_FamilyTree renames CurrentTree.Tree;
+                            begin
+                                if KeyMustBePresent then
+                                    if not isPresent(Tree, TempInt) then
+                                        raise Absent_Key_Exception;
+                                    end if;
+                                else
+                                    if isPresent(Tree, TempInt) then
+                                        raise Present_Key_Exception;
+                                    end if;
+                                end if;
+                            end;
+                        end if;
                     end if;
 
                     Pointer.all := Input;
@@ -184,69 +213,14 @@ procedure Menu is
                 end if;
             exception
                 when Data_Error | Constraint_Error =>
-                    -- QUOICOUBEH;
-                    New_Line;
-                    Put(getColoredString("Saisie invalide, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ", ERROR));
-                    ShowTextString := False;
+                    HandleException("Saisie invalide, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
+                when Present_Key_Exception =>
+                    HandleException("La clé " & Integer'Image(TempInt) & " est déjà présente dans l'arbre, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
+                when Absent_Key_Exception =>
+                    HandleException("La clé " & Integer'Image(TempInt) & " n'est pas présente dans l'arbre, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
             end;
         end loop;
     end HandleInput;
-
-    function GetKeyByInput(mustBePresent : in Boolean; checkPresence : in Boolean := True) return Integer is
-        -- checkPresence to check if key is absent / present
-        -- isPresent if the key is supposed to be present
-        -- not isPresent if the key is supposed to be absent
-        ExitGetKey : Boolean := False;
-        ShowGetKeyMenu : Boolean := True;
-        IntegerKey : Integer;
-        Key : Unbounded_String;
-
-        procedure Handle_Exception(Message : in String) is
-        begin
-            -- QUOICOUBEH;
-            New_Line;
-            Put(getColoredString(Message, ERROR));
-            ShowGetKeyMenu := False;
-        end Handle_Exception;
-    begin
-        while not ExitGetKey loop
-            begin
-                if ShowGetKeyMenu then
-                    Put ("Entrez la clé: ");
-                end if;
-                
-                Key := To_Unbounded_String(Get_Line);
-
-                if not (Key = QuitCharacter) then
-                    IntegerKey := Integer'Value(To_String(Key));
-
-                    if checkPresence then
-                        if mustBePresent then
-                            if not isPresent(CurrentTree.Tree, IntegerKey) then
-                                raise Absent_Key_Exception;
-                            end if;
-                        else
-                            if isPresent(CurrentTree.Tree, IntegerKey) then
-                                raise Present_Key_Exception;
-                            end if;
-                        end if;
-                    end if;
-
-                    return IntegerKey;
-                else
-                    return -1;
-                end if;
-            exception
-                when Data_Error | Constraint_Error =>
-                    Handle_Exception("Saisie invalide, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
-                when Present_Key_Exception =>
-                    Handle_Exception("La clé " & To_String(Key) & " est déjà présente dans l'arbre, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
-                when Absent_Key_Exception =>
-                    Handle_Exception("La clé " & To_String(Key) & " n'est pas présente dans l'arbre, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
-            end;
-        end loop;
-        return -1;
-    end GetKeyByInput;
 
     function GetExistingTreesLength return Integer is
     begin
@@ -278,9 +252,8 @@ procedure Menu is
         end loop;
     end ShowExistingTrees;
 
-    ExitCreateNewPersonMenu : aliased Boolean := False;
     NewPerson : aliased T_Person;
-    NewPersonKey : aliased Integer := 1;
+    NewPersonKey : aliased Unbounded_String;
     FirstName : aliased Unbounded_String;
     LastName : aliased Unbounded_String;
     Gender : aliased Unbounded_String;
@@ -294,13 +267,8 @@ procedure Menu is
             Put_Line ("--- Ajout d'un nouvel ancêtre ---");
         end if;
         New_Line;
-
-        --  NewPersonKey := GetKeyByInput(False, False);
-        NewPersonKey := NewPersonKey + 1;
-        --  if NewPersonKey = -1 then
-        --      ExitCreateNewPersonMenu := True;
-        --  end if;
         begin
+            HandleInput (Pointer => NewPersonKey'Access, TextString => "Entrez la clé: ", InputType => KEY, CheckKeyPresence => False);
             HandleInput (Pointer => FirstName'Access, TextString => "Entrez le prénom de la personne: ");
             HandleInput (Pointer => LastName'Access, TextString => "Entrez le nom de la personne: ");
             HandleInput (Pointer => Gender'Access, TextString => "Entrez le sexe de la personne: ");
@@ -388,7 +356,7 @@ procedure Menu is
                 HandleCreateNewPerson;
 
                 CurrentTree := ExistingTrees.Element(Index => ExistingTrees.Last_Index);
-                initChild (Tree, NewPersonKey, NewPerson);
+                initChild (Tree, Integer'Value(To_String(NewPersonKey)), NewPerson);
                 ExistingTrees.Replace_Element(ExistingTrees.Last_Index, CurrentTree);
                 New_Line;
                 Put_Line(getColoredString("L'arbre " & To_String(CurrentTree.Name) & " a été crée.", SUCCESS));
@@ -404,7 +372,6 @@ procedure Menu is
     end HandleCreateTree;
 	
     NewVerbosity : aliased Unbounded_String;
-    ExitChangeVerbosityMenu : aliased Boolean := False;
     procedure HandleChangeVerbosity is
     begin
         New_Line;

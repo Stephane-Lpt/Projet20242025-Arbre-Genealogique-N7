@@ -2,7 +2,7 @@ package utils is
    type T_Position is (ROOT, LEFT, RIGHT);
    type T_PropToShow is (Keys, Elements);
    type T_ColorType is (SUCCESS, WARNING, ERROR);
-   type T_InputType is (STR, INT);
+   type T_InputType is (STR, INT, KEY);
    type T_OperationType is (CHOOSE, DELETE);
 
    Present_Key_Exception : exception;      -- une clé est déjà présente dans un ABR
