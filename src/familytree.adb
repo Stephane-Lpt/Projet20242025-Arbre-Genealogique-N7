@@ -43,16 +43,6 @@ package body FamilyTree is
       return FamilyTree;
    end GetExampleFamilyTree;
 
-   function isEmpty(ABR : in T_FamilyTree) return Boolean is
-   begin
-      return Tree.isEmpty (ABR);
-   end isEmpty;
-
-   function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean is
-   begin
-      return Tree.isPresent (ABR, Key);
-   end isPresent;
-
    procedure initFamilyTree(ABR : out T_FamilyTree) is
    begin
       initTree(ABR);

@@ -20,10 +20,6 @@ package FamilyTree is
 
    function GetExampleFamilyTree return T_FamilyTree;
 
-   function isEmpty(ABR : in T_FamilyTree) return Boolean;
-
-   function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean;
-
    function getEmptyFamilyTree return T_FamilyTree;
 
    -- INITIALIZES AN EMPTY FAMILY TREE
@@ -81,8 +77,5 @@ package FamilyTree is
    function Length(Vector: TreeVector.Vector) return Integer;
 
    function First_Element(Vector: TreeVector.Vector) return T_FamilyTree;
-
-   --  REMOVE?
-   procedure printKey(ABR : in T_FamilyTree);
 
 end FamilyTree;

@@ -228,9 +228,5 @@ package body BinaryTree is
    begin
       return ABR.Element;
    end getElement;
-
-
-
-
-
+   
 end BinaryTree;
