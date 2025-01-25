@@ -85,7 +85,7 @@ package body FamilyTree is
             -- Calcul récursif des profondeurs gauche/droite
             Left_Depth  := Max_Depth(getLeftChild(Node));
             Right_Depth := Max_Depth(getRightChild(Node));
-            
+
             -- Retourne la profondeur max + 1 (niveau courant)
             return 1 + Integer'Max(Left_Depth, Right_Depth);
          end if;
@@ -97,7 +97,7 @@ package body FamilyTree is
 
    -- 3. Obtenir le nombre d’ancêtres connus (lui compris) d’un individu donné
    function getAncestorsCount
-   (ABR : in T_FamilyTree; Key : in Integer) return Integer 
+   (ABR : in T_FamilyTree; Key : in Integer) return Integer
    is
       Node : constant T_FamilyTree := getNode(ABR, Key);
    begin
@@ -105,8 +105,8 @@ package body FamilyTree is
    end getAncestorsCount;
 
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
-   function getAncestorsByGeneration (ABR : in T_FamilyTree; 
-                                    Key : in Integer; 
+   function getAncestorsByGeneration (ABR : in T_FamilyTree;
+                                    Key : in Integer;
                                     Generation : in Integer) return TreeVector.Vector is
 
       TargetABR : constant T_FamilyTree := getNode(ABR, Key);
@@ -166,8 +166,34 @@ package body FamilyTree is
 
    -- 7. Obtenir l’ensemble des individus qui n’ont pas de parents connus.
    function getOrphanIndividuals (ABR : in T_FamilyTree; Key : in Integer) return TreeVector.Vector is
-       OrphanIndividuals : TreeVector.Vector;
+      OrphanIndividuals : TreeVector.Vector;
+      TargetNode : constant T_BinaryTree := getNode(ABR, Key);
+
+      procedure TraverseAndCollect(Node : T_BinaryTree) is
+         Left, Right : T_BinaryTree;
+      begin
+         if isEmpty(Node) then
+            return;
+         end if;
+
+         Left := getLeftChild(Node);
+         Right := getRightChild(Node);
+
+         -- Vérifier si les deux parents sont inconnus
+         if isEmpty(Left) and isEmpty(Right) then
+            OrphanIndividuals.Append(Node);
+         end if;
+
+         -- Explorer récursivement les deux branches
+         TraverseAndCollect(Left);
+         TraverseAndCollect(Right);
+      end TraverseAndCollect;
+
    begin
+      if not isEmpty(TargetNode) then
+         TraverseAndCollect(TargetNode);
+      end if;
+
       return OrphanIndividuals;
    end getOrphanIndividuals;
 
@@ -187,8 +213,8 @@ package body FamilyTree is
          Right := getRightChild(Node);
 
          -- Vérifier si un seul parent est connu
-         if (not isEmpty(Left) and isEmpty(Right)) or 
-            (isEmpty(Left) and not isEmpty(Right)) 
+         if (not isEmpty(Left) and isEmpty(Right)) or
+            (isEmpty(Left) and not isEmpty(Right))
          then
             SingleParentIndividuals.Append(Node);
          end if;
@@ -240,7 +266,7 @@ package body FamilyTree is
    end getDualParentIndividuals;
 
    -- Getters
-   --function 
+   --function
 
    function getNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree is
    begin
