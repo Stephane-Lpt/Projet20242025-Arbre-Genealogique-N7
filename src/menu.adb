@@ -49,108 +49,6 @@ procedure Menu is
 
     OperationAbandonnedException : exception;
 
-    
-    TreeMenuChoice : aliased Unbounded_String;
-    procedure TreeMenu is
-        procedure HandleAddAncestor is
-        begin
-            null;
-        end HandleAddAncestor;
-
-        procedure HandleModifyAncestor is
-        begin
-            null;
-        end HandleModifyAncestor;
-
-        procedure HandleDeleteAncestor is
-        begin
-            null;
-        end HandleDeleteAncestor;
-
-        procedure HandleGetAncestorsCount is
-        begin
-            null;
-        end HandleGetAncestorsCount;
-
-        procedure HandleGetAncestorsByGeneration is
-        begin
-            null;
-        end HandleGetAncestorsByGeneration;
-
-        procedure HandleShowTree is
-        begin
-            null;
-        end HandleShowTree;
-
-        procedure HandleGetOrphanIndividuals is
-        begin
-            null;
-        end HandleGetOrphanIndividuals;
-
-        procedure HandleGetSingleParentIndividuals is
-        begin
-            null;
-        end HandleGetSingleParentIndividuals;
-
-        procedure HandleGetDualParentIndividuals is
-        begin
-            null;
-        end HandleGetDualParentIndividuals;
-
-        Choice : Integer;
-        ExitTreeMenu : Boolean := False;
-
-    begin
-        while not ExitTreeMenu loop
-            New_Line;
-            Put_Line ("--- Gestion de l'arbre " & To_String(CurrentTree.Name) & " ---");
-            New_Line;
-            showFamilyTree (CurrentTree.Tree, Verbosity => 2);
-            New_Line;
-            Put_Line ("1. Afficher l'arbre avec la verbosité " & getTrimmedInt(Verbosity));
-            Put_Line ("2. Afficher l'arbre à partir d'un noeud donne");
-            Put_Line ("3. Ajouter un ancêtre");
-            Put_Line ("4. Supprimer un ancêtre");
-            Put_Line ("5. Obtenir le nombre d'ancêtres connus d'un individu");
-            Put_Line ("6. Obtenir l'ensemble des ancêtres de generation N d'un individu");
-            Put_Line ("7. Obtenir les individus sans parents connus");
-            Put_Line ("8. Obtenir les individus avec un seul parent connu");
-            Put_Line ("9. Obtenir les individus avec deux parents");
-            
-            begin
-                HandleInput
-            New_Line;
-            Put ("Entrez votre choix (1-11) : ");
-            Get (Item => Choice);
-
-            case Choice is
-                when 1 =>
-                    showFamilyTree (CurrentTree.Tree, Verbosity);
-                when 2 =>
-                    Null;
-                when 3 =>
-                    HandleAddAncestor;
-                when 4 =>
-                    HandleGetAncestorsCount;
-                when 5 =>
-                    HandleGetAncestorsByGeneration;
-                when 6 =>
-                    HandleShowTree;
-                when 7 =>
-                    HandleGetOrphanIndividuals;
-                when 8 =>
-                    HandleGetSingleParentIndividuals;
-                when 9 =>
-                    HandleGetDualParentIndividuals;
-                when 11 =>
-                    ExitTreeMenu := True;
-                when others =>
-                    Put_Line ("Choix invalide, veuillez réessayer (1-11).");
-            end case;
-        end loop;
-
-    end TreeMenu;
-    
     procedure HandleInput(Pointer : in String_Access; TextString : in String; InputType : in T_InputType := STR; MaxInt : in Integer := -1; CheckKeyPresence : Boolean := False; KeyMustBePresent : Boolean := False) is
         -- GET IMPUT FROM USER
         -- Pointer : pointer to the string that is going to be modified
@@ -163,6 +61,7 @@ procedure Menu is
         ShowTextString : Boolean := True;
         Input : Unbounded_String;
         TempInt : Integer;
+        Tree: T_FamilyTree renames CurrentTree.Tree;
 
         procedure HandleException(ErrorText : in String) is 
         begin
@@ -192,19 +91,15 @@ procedure Menu is
                         end if;
                     elsif InputType = KEY then
                         if CheckKeyPresence then
-                            declare 
-                                Tree: T_FamilyTree renames CurrentTree.Tree;
-                            begin
-                                if KeyMustBePresent then
-                                    if not isPresent(Tree, TempInt) then
-                                        raise Absent_Key_Exception;
-                                    end if;
-                                else
-                                    if isPresent(Tree, TempInt) then
-                                        raise Present_Key_Exception;
-                                    end if;
+                            if KeyMustBePresent then
+                                if not isPresent(Tree, TempInt) then
+                                    raise Absent_Key_Exception;
                                 end if;
-                            end;
+                            else
+                                if isPresent(Tree, TempInt) then
+                                    raise Present_Key_Exception;
+                                end if;
+                            end if;
                         end if;
                     end if;
 
@@ -215,9 +110,9 @@ procedure Menu is
                 when Data_Error | Constraint_Error =>
                     HandleException("Saisie invalide, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
                 when Present_Key_Exception =>
-                    HandleException("La clé " & Integer'Image(TempInt) & " est déjà présente dans l'arbre, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
+                    HandleException("La clé " & getTrimmedInt(TempInt) & " est déjà présente dans l'arbre, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
                 when Absent_Key_Exception =>
-                    HandleException("La clé " & Integer'Image(TempInt) & " n'est pas présente dans l'arbre, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
+                    HandleException("La clé " & getTrimmedInt(TempInt) & " n'est pas présente dans l'arbre, veuillez réessayer ('" & To_String(QuitCharacter) & "' pour quitter): ");
             end;
         end loop;
     end HandleInput;
@@ -258,7 +153,7 @@ procedure Menu is
     LastName : aliased Unbounded_String;
     Gender : aliased Unbounded_String;
     Birthdate : aliased Unbounded_String;
-    procedure HandleCreateNewPerson(Position : in T_Position := ROOT) is
+    procedure HandleCreateNewPerson(CheckKeyPresence : Boolean := True; Position : in T_Position := ROOT) is
     begin
         New_Line;
         if Position = ROOT then
@@ -268,7 +163,7 @@ procedure Menu is
         end if;
         New_Line;
         begin
-            HandleInput (Pointer => NewPersonKey'Access, TextString => "Entrez la clé: ", InputType => KEY, CheckKeyPresence => False);
+            HandleInput (Pointer => NewPersonKey'Access, TextString => "Entrez la clé: ", InputType => KEY, CheckKeyPresence => CheckKeyPresence);
             HandleInput (Pointer => FirstName'Access, TextString => "Entrez le prénom de la personne: ");
             HandleInput (Pointer => LastName'Access, TextString => "Entrez le nom de la personne: ");
             HandleInput (Pointer => Gender'Access, TextString => "Entrez le sexe de la personne: ");
@@ -299,46 +194,6 @@ procedure Menu is
         end;
     end HandleCreateNewPerson;
 
-    TreeOperationIndex : aliased Unbounded_String;
-    procedure HandleTreeOperation(Operation : in T_OperationType) is
-        TitleText : String := (if Operation = CHOOSE then "Choisir un arbre" else "Supprimer un arbre");
-    begin
-        if GetExistingTreesLength - 1 > 0 then
-            New_Line;
-            Put_Line ("--- " & TitleText & " ---");
-            New_Line;
-            ShowExistingTrees;
-            Put_Line ("q. Retourner au menu principal");
-            New_Line;
-
-            TreeOperationIndex := To_Unbounded_String("-1");
-            begin
-                HandleInput (Pointer => TreeOperationIndex'Access, TextString => "Entrez votre choix " & getMenuRangeString (GetExistingTreesLength) & ": ", InputType => INT, MaxInt => GetExistingTreesLength - 1);
-
-                if Operation = CHOOSE then
-                    CurrentTree := ExistingTrees.Element (Integer'Value(To_String(TreeOperationIndex)) - 1);
-
-                    New_Line;
-                    Put_Line(getColoredString("L'arbre '" & To_String(CurrentTree.Name) & "' a été choisi.", SUCCESS)); 
-                    TreeMenu;
-                elsif OPERATION = DELETE then
-                    --  TODO : delete memory from this tree ( stephane ? )
-
-                    New_Line;
-                    Put_Line(getColoredString("L'arbre '" & To_String(ExistingTrees.Element(Integer'Value(To_String(TreeOperationIndex)) - 1).Name) & "' a été supprimé.", SUCCESS));
-                    Delete(ExistingTrees, Integer'Value(To_String(TreeOperationIndex)) - 1);
-                end if;
-            
-            exception
-                when OperationAbandonnedException =>
-                    Null;
-            end;
-        else
-            New_Line;
-            Put_Line(getColoredString("Aucun arbre existant. Veuillez d'abord en créer un.", WARNING));
-        end if;
-    end HandleTreeOperation;
-
     NewTreeName : aliased Unbounded_String;
     procedure HandleCreateTree is
         Tree: T_FamilyTree renames CurrentTree.Tree;
@@ -353,7 +208,7 @@ procedure Menu is
             AddNewTree (To_String(NewTreeName));
 
             begin
-                HandleCreateNewPerson;
+                HandleCreateNewPerson (CheckKeyPresence => False);
 
                 CurrentTree := ExistingTrees.Element(Index => ExistingTrees.Last_Index);
                 initChild (Tree, Integer'Value(To_String(NewPersonKey)), NewPerson);
@@ -400,6 +255,163 @@ procedure Menu is
                 Null;
         end;
     end HandleChangeVerbosity;
+
+    TreeMenuChoice : aliased Unbounded_String;
+    TargetKey : aliased Unbounded_String;
+    TargetPosition : aliased Unbounded_String;
+    procedure TreeMenu is
+        procedure HandleShowTreeFromId is
+        begin
+			--  ShowDefaultTree := True; somewhere ...
+			Null;
+        end HandleShowTreeFromId;
+
+        procedure HandleAddAncestor is
+            Tree : T_FamilyTree renames CurrentTree.Tree;
+        begin
+            begin
+                HandleInput (Pointer => TargetKey'Access, TextString => "Entrez la clé de la personne à qui ajouter l'ancêtre: ", InputType => KEY, CheckKeyPresence => True, KeyMustBePresent => True);
+                
+                HandleCreateNewPerson;
+                
+                --  initChild (Tree, Integer'Value(To_String(NewPersonKey)), NewPerson);
+
+                New_Line;
+                Put_Line(getColoredString("L'ancêtre' " & To_String(NewPersonKey) & " a été ajouté à l'individu " & To_String(TargetKey) & ".", SUCCESS));
+            exception
+                when OperationAbandonnedException =>
+                    New_Line;
+                    Put_Line(getColoredString("Abandon de l'operation. La personne n'a pas été ajoutée.", WARNING));
+            end;
+        end HandleAddAncestor;
+
+        procedure HandleDeleteAncestor is
+        begin
+            null;
+        end HandleDeleteAncestor;
+
+        procedure HandleGetAncestorsCount is
+        begin
+            null;
+        end HandleGetAncestorsCount;
+
+        procedure HandleGetAncestorsByGeneration is
+        begin
+            null;
+        end HandleGetAncestorsByGeneration;
+
+        procedure HandleGetOrphanIndividuals is
+        begin
+            null;
+        end HandleGetOrphanIndividuals;
+
+        procedure HandleGetSingleParentIndividuals is
+        begin
+            null;
+        end HandleGetSingleParentIndividuals;
+
+        procedure HandleGetDualParentIndividuals is
+        begin
+            null;
+        end HandleGetDualParentIndividuals;
+
+        ExitTreeMenu : Boolean := False;
+        ShowDefaultTree : Boolean := True;
+        Tree : T_FamilyTree renames CurrentTree.Tree;
+    begin
+        while not ExitTreeMenu loop
+            New_Line;
+            Put_Line ("--- Gestion de l'arbre " & To_String(CurrentTree.Name) & " ---");
+            New_Line;
+            if ShowDefaultTree then
+                showFamilyTree (Tree, Verbosity => 2);
+            else
+                showFamilyTree (Tree, Verbosity);
+                ShowDefaultTree := True;
+            end if;
+            New_Line;
+            Put_Line ("1. Afficher l'arbre avec la verbosité " & getTrimmedInt(Verbosity));
+            Put_Line ("2. Afficher l'arbre à partir d'un noeud donne");
+            Put_Line ("3. Ajouter un ancêtre");
+            Put_Line ("4. Supprimer un ancêtre");
+            Put_Line ("5. Obtenir le nombre d'ancêtres connus d'un individu");
+            Put_Line ("6. Obtenir l'ensemble des ancêtres de generation N d'un individu");
+            Put_Line ("7. Obtenir les individus sans parents connus");
+            Put_Line ("8. Obtenir les individus avec un seul parent connu");
+            Put_Line ("9. Obtenir les individus avec deux parents connu");
+            
+            begin
+                HandleInput (Pointer => TreeMenuChoice'Access, TextString => "Entrez votre choix " & getMenuRangeString (9) & ": ", InputType => INT, MaxInt => 9);
+
+                case Integer'Value(To_String(TreeMenuChoice)) is
+                    when 1 =>
+                        ShowDefaultTree := False;
+                    when 2 =>
+                        HandleShowTreeFromId;
+                    when 3 =>
+                        HandleAddAncestor;
+                    when 4 =>
+                        HandleDeleteAncestor;
+                    when 5 =>
+                        HandleGetAncestorsCount;
+                    when 6 =>
+                        HandleGetAncestorsByGeneration;
+                    when 7 =>
+                        HandleGetOrphanIndividuals;
+                    when 8 =>
+                        HandleGetSingleParentIndividuals;
+                    when 9 =>
+                        HandleGetDualParentIndividuals;
+                    when others =>
+                        Null;
+                end case;
+            exception
+                when OperationAbandonnedException =>
+                    ExitTreeMenu := True;
+            end;
+        end loop;
+
+    end TreeMenu;
+    
+    TreeOperationIndex : aliased Unbounded_String;
+    procedure HandleTreeOperation(Operation : in T_OperationType) is
+        TitleText : String := (if Operation = CHOOSE then "Choisir un arbre" else "Supprimer un arbre");
+    begin
+        if GetExistingTreesLength - 1 > 0 then
+            New_Line;
+            Put_Line ("--- " & TitleText & " ---");
+            New_Line;
+            ShowExistingTrees;
+            Put_Line ("q. Retourner au menu principal");
+            New_Line;
+
+            TreeOperationIndex := To_Unbounded_String("-1");
+            begin
+                HandleInput (Pointer => TreeOperationIndex'Access, TextString => "Entrez votre choix " & getMenuRangeString (GetExistingTreesLength) & ": ", InputType => INT, MaxInt => GetExistingTreesLength - 1);
+
+                if Operation = CHOOSE then
+                    CurrentTree := ExistingTrees.Element (Integer'Value(To_String(TreeOperationIndex)) - 1);
+
+                    New_Line;
+                    Put_Line(getColoredString("L'arbre '" & To_String(CurrentTree.Name) & "' a été choisi.", SUCCESS)); 
+                    TreeMenu;
+                elsif OPERATION = DELETE then
+                    --  TODO : delete memory from this tree ( stephane ? )
+
+                    New_Line;
+                    Put_Line(getColoredString("L'arbre '" & To_String(ExistingTrees.Element(Integer'Value(To_String(TreeOperationIndex)) - 1).Name) & "' a été supprimé.", SUCCESS));
+                    Delete(ExistingTrees, Integer'Value(To_String(TreeOperationIndex)) - 1);
+                end if;
+            
+            exception
+                when OperationAbandonnedException =>
+                    Null;
+            end;
+        else
+            New_Line;
+            Put_Line(getColoredString("Aucun arbre existant. Veuillez d'abord en créer un.", WARNING));
+        end if;
+    end HandleTreeOperation;
 
     MainMenuChoice : aliased Unbounded_String;
 begin
