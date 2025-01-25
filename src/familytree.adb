@@ -80,67 +80,86 @@ package body FamilyTree is
 
    procedure deleteAncestor (ABR : in out T_FamilyTree; TargetKey : in Integer) is
    begin
-      Null;
+      deleteNodeRecursive (ABR, TargetKey);
    end deleteAncestor;
 
    -- Renvoie le nombre de générations dans un arbre donné
    function getGenerationsCount (ABR : in T_BinaryTree) return Integer is
+      function Max_Depth(Node : T_BinaryTree) return Integer is
+         Left_Depth  : Integer := 0;
+         Right_Depth : Integer := 0;
+      begin
+         if isEmpty(Node) then
+            return 0;
+         else
+            -- Calcul récursif des profondeurs gauche/droite
+            Left_Depth  := Max_Depth(getLeftChild(Node));
+            Right_Depth := Max_Depth(getRightChild(Node));
+            
+            -- Retourne la profondeur max + 1 (niveau courant)
+            return 1 + Integer'Max(Left_Depth, Right_Depth);
+         end if;
+      end Max_Depth;
+
    begin
-      return 0;
+      return Max_Depth(ABR);
    end getGenerationsCount;
 
    -- 3. Obtenir le nombre d’ancêtres connus (lui compris) d’un individu donné
    function getAncestorsCount
-     (ABR : in T_BinaryTree; Key : in Integer) return Integer is
+   (ABR : in T_FamilyTree; Key : in Integer) return Integer 
+   is
+      Node : constant T_FamilyTree := getNode(ABR, Key);
    begin
-      return 0;
+      return getSize(Node); -- Utilise la fonction getSize existante du BinaryTree
    end getAncestorsCount;
 
    -- 4. Obtenir l’ensemble des ancêtres situés à une certaine génération d’un individu donné.
-   function getAncestorsByGeneration (ABR : in T_BinaryTree;
-                                   Key : in Integer;
-                                   Generation : in Integer) return TreeVector.Vector is
-   -- A vector to store the ancestors at the specified generation
-   Ancestors : TreeVector.Vector := TreeVector.Empty_Vector;
-   Stop : Boolean := False;
+   function getAncestorsByGeneration (ABR : in T_FamilyTree; 
+                                    Key : in Integer; 
+                                    Generation : in Integer) return TreeVector.Vector is
 
-   -- Find the node with the given Key
-   NodeToFind : T_FamilyTree := getNode(ABR, Key);
+      TargetABR : constant T_FamilyTree := getNode(ABR, Key);
 
-   -- A helper procedure to process each ancestor during the traversal
-   procedure processAncestor (ABR : in out T_BinaryTree;
-                              Parent : in out T_BinaryTree;
-                              Stop : in out Boolean) is
-      GenLevel : Integer := 0;
+      -- Fonction helper récursive pour collecter les ancêtres à la génération cible
+      function Helper (ABR : T_FamilyTree; CurrentGen : Integer) return TreeVector.Vector is
+         Result : TreeVector.Vector;
       begin
-         if isEmpty(ABR) or else Stop then
-            return;
+         if isEmpty(ABR) then
+            return Result;  -- Fin de branche
          end if;
 
-         -- If we are at the target generation level, add the ancestor to the vector
-         if GenLevel = Generation then
-            -- Add ABR to Ancestors (you may need to define how TreeVector works)
-            Ancestors.append(ABR);
-            Stop := True;  -- Stop further traversal after finding the generation
+         -- Si on a atteint la génération cible
+         if CurrentGen = Generation then
+            Result.Append(ABR);  -- Ajouter le nœud courant
+            return Result;
          end if;
 
-         -- Continue the traversal upward if we are not yet at the desired generation
-         if GenLevel < Generation then
-            GenLevel := GenLevel + 1;
-         end if;
+         -- Explorer récursivement les deux parents avec génération+1
+         declare
+            LeftResult  : constant TreeVector.Vector := Helper(getLeftChild(ABR), CurrentGen + 1);
+            RightResult : constant TreeVector.Vector := Helper(getRightChild(ABR), CurrentGen + 1);
+         begin
+            -- Fusionner les résultats
+            for E of LeftResult loop
+               Result.Append(E);
+            end loop;
+            for E of RightResult loop
+               Result.Append(E);
+            end loop;
+         end;
 
-      end processAncestor;
+         return Result;
+      end Helper;
 
    begin
-      -- Check if the node to find exists
-      if isEmpty(NodeToFind) then
-         return Ancestors;  -- Return empty vector if node not found
+      -- Gestion des cas d'erreur
+      if isEmpty(TargetABR) or Generation < 0 then
+         return TreeVector.Empty_Vector;
       end if;
 
-      -- Traverse the tree and apply the processAncestor procedure
-      --traverseTreeAndApply(ABR, Parent => null, ActionCallback => processAncestor, Stop => Stop);
-
-      return Ancestors;
+      -- Démarrer la récursion depuis le nœud cible (génération 0)
+      return Helper(TargetABR, 0);
    end getAncestorsByGeneration;
 
    -- Afficher l’arbre.
@@ -164,41 +183,113 @@ package body FamilyTree is
 
    -- 8. Obtenir l’ensemble des individus qui n’ont qu’un parent connu.
    function getSingleParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector is
-       SingleParentIndividuals : TreeVector.Vector;
+      SingleParentIndividuals : TreeVector.Vector;
+      TargetNode : constant T_BinaryTree := getNode(ABR, Key);
+
+      procedure TraverseAndCollect(Node : T_BinaryTree) is
+         Left, Right : T_BinaryTree;
+      begin
+         if isEmpty(Node) then
+            return;
+         end if;
+
+         Left := getLeftChild(Node);
+         Right := getRightChild(Node);
+
+         -- Vérifier si un seul parent est connu
+         if (not isEmpty(Left) and isEmpty(Right)) or 
+            (isEmpty(Left) and not isEmpty(Right)) 
+         then
+            SingleParentIndividuals.Append(Node);
+         end if;
+
+         -- Explorer récursivement les deux branches
+         TraverseAndCollect(Left);
+         TraverseAndCollect(Right);
+      end TraverseAndCollect;
+
    begin
+      if not isEmpty(TargetNode) then
+         TraverseAndCollect(TargetNode);
+      end if;
+
       return SingleParentIndividuals;
    end getSingleParentIndividuals;
 
    -- 9. Obtenir l’ensemble des individus dont les deux parents sont connus.
    function getDualParentIndividuals (ABR : in T_BinaryTree; Key : in Integer) return TreeVector.Vector is
       DualParentIndividuals : TreeVector.Vector;
+      TargetNode : constant T_BinaryTree := getNode(ABR, Key);
+
+      procedure TraverseAndCollect(Node : T_BinaryTree) is
+         Left, Right : T_BinaryTree;
+      begin
+         if isEmpty(Node) then
+            return;
+         end if;
+
+         Left := getLeftChild(Node);
+         Right := getRightChild(Node);
+
+         -- Vérifier si les deux parents sont connus
+         if not isEmpty(Left) and not isEmpty(Right) then
+            DualParentIndividuals.Append(Node);
+         end if;
+
+         -- Explorer récursivement les deux branches
+         TraverseAndCollect(Left);
+         TraverseAndCollect(Right);
+      end TraverseAndCollect;
+
    begin
+      if not isEmpty(TargetNode) then
+         TraverseAndCollect(TargetNode);
+      end if;
+
       return DualParentIndividuals;
    end getDualParentIndividuals;
 
    -- Getters
-   --function
+   --function 
 
-   function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree is
+   function getNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree is
    begin
-      case Position is
-         when ROOT =>
-            raise Wrong_Position_Exception;
-         when LEFT =>
-            return getLeftChild (ABR);
-         when RIGHT =>
-            return getLeftChild (ABR);
-      end case;
-   end getParent;
+      return Tree.getNode(ABR, Key);
+   end getNode;
 
-   function getFamilyNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree is
+   function isEmpty (ABR : in T_FamilyTree) return Boolean is
    begin
-      return getNode(ABR, Key);
-   end getFamilyNode;
+      return Tree.isEmpty(ABR);
+   end isEmpty;
 
-   procedure printKey(ABR : in T_FamilyTree) is
+   procedure clean (ABR : in out T_FamilyTree) is
    begin
-      Put_Line(Integer'Image(getKey(ABR)));
-   end printKey;
+      Tree.clean(ABR); -- Appel à la version générique
+   end clean;
+
+   function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean is
+   begin
+      return Tree.isPresent(ABR, Key);
+   end isPresent;
+
+   function getKey (ABR : T_FamilyTree) return Integer is
+   begin
+      return Tree.getKey(ABR);
+   end getKey;
+
+   -- Vector helpers
+   function Length(Vector: TreeVector.Vector) return Integer is
+   begin
+      return Integer(Vector.Length);
+   end Length;
+
+   function First_Element(Vector: TreeVector.Vector) return T_FamilyTree is
+   begin
+      return Vector.First_Element;
+   end First_Element;
+
+
+
+
 
 end FamilyTree;

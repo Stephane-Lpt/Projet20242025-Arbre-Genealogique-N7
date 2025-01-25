@@ -60,13 +60,15 @@ package BinaryTree is
                               ActionCallback : not null access procedure (ABR : in out T_BinaryTree; Parent : in out T_BinaryTree; Stop : in out Boolean); 
                               Stop : in out  Boolean);
 
-  function getKey (ABR : T_BinaryTree) return Integer;
+   function getKey (ABR : T_BinaryTree) return Integer;
 
-  function getLeftChild (ABR : T_BinaryTree) return T_BinaryTree;
-  procedure setLeftChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
+   function getLeftChild (ABR : T_BinaryTree) return T_BinaryTree;
+   procedure setLeftChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
 
-  function getRightChild (ABR : T_BinaryTree) return T_BinaryTree;
-  procedure setRightChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
+   function getRightChild (ABR : T_BinaryTree) return T_BinaryTree;
+   procedure setRightChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
+
+   function getElement (ABR : T_BinaryTree) return T_Element;
 
      
 private

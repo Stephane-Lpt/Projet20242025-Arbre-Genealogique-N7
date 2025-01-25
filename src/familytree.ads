@@ -33,8 +33,7 @@ package FamilyTree is
    -- 1. Créer un arbre minimal contenant le seul nœud racine, sans père ni mère.
    procedure initChild
      (ABR : out T_FamilyTree; Key: in Integer; Person : in T_Person) with
-     Post =>
-      getGenerationsCount (ABR) = 0; -- SHOULD HAVE ONE SINGLE GENERATION
+     Post => getGenerationsCount (ABR) = 1; -- SHOULD HAVE ONE SINGLE GENERATION
 
    procedure addAncestor (ABR : in out T_FamilyTree; TargetKey : in Integer; Position : in T_Position; NewKey : in Integer; NewPerson: in T_Person);
 
@@ -67,10 +66,21 @@ package FamilyTree is
    function getDualParentIndividuals
      (ABR : in T_FamilyTree; Key : in Integer) return TreeVector.Vector;
 
-   function getParent (ABR : in T_FamilyTree; Position : in T_Position) return T_FamilyTree;
+   function getNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree;
 
-   --  REMOVE?
-   function getFamilyNode(ABR : in T_FamilyTree; Key : in Integer ) return T_FamilyTree;
+   function isEmpty (ABR : in T_FamilyTree) return Boolean;
+
+   procedure clean (ABR : in out T_FamilyTree);
+
+   function isPresent(ABR : in T_FamilyTree; Key : in Integer) return Boolean;
+
+   function getKey (ABR : T_FamilyTree) return Integer;
+
+   -- Vectors helper functions
+
+   function Length(Vector: TreeVector.Vector) return Integer;
+
+   function First_Element(Vector: TreeVector.Vector) return T_FamilyTree;
 
    --  REMOVE?
    procedure printKey(ABR : in T_FamilyTree);
