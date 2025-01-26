@@ -2,7 +2,10 @@ with Utils; use Utils;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package Person is
+   EmptyString      : constant Unbounded_String := To_Unbounded_String ("");
    type T_Person is private;
+
+   function GetPersonName(Person : in T_Person; Key : in Integer; OnlyReturnFullNames : Boolean := False) return String;
 
    -- showPerson
    -- Verbosity 1 : shows 'parentX : key' pair
@@ -13,10 +16,10 @@ package Person is
       Pre => 1 <= Verbosity and Verbosity <= 4;
 
    function initPersonObj(
-                          FirstName : in Unbounded_String := To_Unbounded_String(""); 
-                          LastName : in Unbounded_String := To_Unbounded_String("");
-                          Gender : in Unbounded_String := To_Unbounded_String("");
-                          BirthDate : in Unbounded_String := To_Unbounded_String("")) return T_Person;
+                          FirstName : in Unbounded_String := EmptyString; 
+                          LastName : in Unbounded_String := EmptyString;
+                          Gender : in Unbounded_String := EmptyString;
+                          BirthDate : in Unbounded_String := EmptyString) return T_Person;
 
 private 
    type T_Person is

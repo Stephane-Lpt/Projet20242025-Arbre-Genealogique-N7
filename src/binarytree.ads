@@ -69,7 +69,6 @@ package BinaryTree is
    procedure setRightChild(ABR : in out T_BinaryTree; Child : T_BinaryTree);
 
    function getElement (ABR : T_BinaryTree) return T_Element;
-
      
 private
    
