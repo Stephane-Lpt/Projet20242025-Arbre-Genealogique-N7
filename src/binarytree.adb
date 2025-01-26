@@ -210,11 +210,15 @@ package body BinaryTree is
    is
    begin
 
+      if ABR = null then
+         return;
+      end if;
+
       -- Appliquer la fonction de traitement sur le nœud courant
       ActionCallback (ABR, Parent, Stop);
 
       -- Si l'arbre est vide ou si le flag Stop est à True, on arrête immédiatement
-      if ABR = null or Stop then
+      if Stop then
          return;
       end if;
 

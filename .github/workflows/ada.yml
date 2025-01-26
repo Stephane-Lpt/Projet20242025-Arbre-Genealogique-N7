@@ -1,0 +1,50 @@
+name: Ada (GNAT)
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Étape 1 : Vérification du code source
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Étape 2 : Installation de GNAT et outils de build
+    - name: Set up GNAT toolchain
+      run: |
+        sudo apt-get update &&
+        sudo apt-get install -y gnat gprbuild
+
+    # Étape 3 : Compilation du projet
+    - name: Build
+      run: gprbuild -P src/pim.gpr -j0 -p
+
+    - name: Debug Build Directory
+      run: ls -R ${{ github.workspace }}/build
+      
+    # Étape 4 : Exécution des tests
+    - name: Run Tests
+      run: |
+        if [ -d "build/bin" ]; then
+          for file in build/bin/*; do
+            if [ -x "$file" ]; then
+              echo -e "\033[34mRunning test: $file\033[0m"
+              "$file"
+            else
+              echo "Skipping: $file (not executable)"
+            fi
+          done
+        else
+          echo "Test directory 'build/bin' not found!"
+          exit 1
+        fi
+
+
+
