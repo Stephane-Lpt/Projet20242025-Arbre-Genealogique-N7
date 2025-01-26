@@ -65,10 +65,8 @@ procedure Menu is
                     raise OperationAbandonnedException;
                 else
                     --  IN CASE WHEN ASKED FOR AN INTEGER, CHECKING IF IT'S A VALID INT
-                    TempInt :=
-                       (if (InputType = INT or InputType = KEY) then
-                           UnboundedToInteger (Input)
-                        else -1);
+                    -- THIS WILL THROW AN ERROR IF IT IS NOT A VALID INT
+                    TempInt := (if (InputType = INT or InputType = KEY) then UnboundedToInteger (Input) else -1);
 
                     if InputType = INT then
                         -- CHECKING IF INT FALLS IN THE 1 .. MaxInt RANGE (only if MaxInt isn't the default value, -1)
@@ -93,6 +91,10 @@ procedure Menu is
                                     raise Present_Key_Exception;
                                 end if;
                             end if;
+                        end if;
+                    elsif InputType = DATE then
+                        if Input /= To_Unbounded_String("") and not IsValidDateString (Input) then
+                            raise Data_Error;
                         end if;
                     end if;
 
@@ -179,10 +181,7 @@ procedure Menu is
             HandleInput
                (Pointer    => Gender'Access,
                 TextString => "Entrez le sexe de la personne: ");
-            HandleInput
-               (Pointer    => Birthdate'Access,
-                TextString =>
-                   "Entrez la date d'anniversaire de la personne: ");
+            HandleInput(Pointer=> Birthdate'Access, TextString => "Entrez la date d'anniversaire de la personne (format JJ-MM-AAAA): ", InputType => DATE);
 
             NewPerson :=
                initPersonObj

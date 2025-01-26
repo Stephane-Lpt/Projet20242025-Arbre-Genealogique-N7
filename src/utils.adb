@@ -1,12 +1,10 @@
 with Ada.Characters.Latin_1;
 with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
 with Ada.Characters;        use Ada.Characters;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package body utils is
 
    function GetMenuRangeString (Length : in Integer) return String is
-      RangeString : Unbounded_String;
    begin
       return "(1-" & GetTrimmedInt (Length) & " ou 'q')";
    end GetMenuRangeString;
@@ -62,5 +60,56 @@ package body utils is
    begin
       return Integer'Value (To_String (Str));
    end UnboundedToInteger;
+   
+    function IsValidDateString(DateUnboundedString : in Unbounded_String) return Boolean is
+        DateString : String (1 .. 10);
+        DAY : Integer;
+        MONTH : Integer;
+        YEAR : Integer;
+
+        function RemoveLeadingZeros (Str : in String) return Integer is
+        begin
+            if Str = "" then
+                return -1;
+            end if;
+            for chr of Str loop
+                if not (chr in '0' .. '9') then
+                    return -1;
+                end if;
+            end loop;
+
+            for I in Str'Range loop
+                if Str(I) /= '0' then
+                    return Integer'Value(Str(I .. Str'Last));
+                end if;
+            end loop;
+
+            return 0;
+        end RemoveLeadingZeros;
+	begin
+        if Length(DateUnboundedString) /= 10 then
+            return false;
+        end if;
+
+        DateString := To_String(DateUnboundedString);
+
+        if DateString(3) /= '-' or DateString(6) /= '-' then
+            return false;
+        end if;
+
+        DAY := RemoveLeadingZeros(DateString(1 .. 2));
+        MONTH := RemoveLeadingZeros(DateString(4 .. 5));
+        YEAR := RemoveLeadingZeros(DateString(7 .. 10));
+
+            -- Validate the extracted values
+        if (DAY < 1 or DAY > 31) or (MONTH < 1 or MONTH > 12) or (YEAR < 0 or YEAR > 2025) then
+            return False;
+        else
+            return True;
+        end if;
+    exception
+        when others => 
+            return False;
+    end IsValidDateString;
 
 end utils;
