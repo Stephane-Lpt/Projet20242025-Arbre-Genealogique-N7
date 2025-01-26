@@ -91,15 +91,12 @@ package body BinaryTree is
          when ROOT =>
             null;
          when RIGHT =>
-            --TempTree.all.Right := new T_Node'(NewElement, null, null);
             TempTree.all.Right := NewNode;
          when LEFT =>
-            --TempTree.all.Left := new T_Node'(NewElement, null, null);
             TempTree.all.Left := NewNode;
       end case;
    end addNode;
 
-   -- TODO
    procedure deleteNode (ABR : in out T_BinaryTree; Key : in Integer) is
       Tree : T_BinaryTree;
    begin

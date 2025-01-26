@@ -1,23 +1,3 @@
--- 1. Choisir un arbre
--- 2. Créer un arbre
--- 3. Supprimer un arbre
--- 4. Changer la verbosité (4 actuellement)
--- 5. Quitter
-
--- 1. Ajouter un ancêtre
--- 2. Modifier les données d'un ancêtre
--- 3. Supprimer un ancêtre
--- 4. Obtenir le nombre d'ancêtres connus d'un individu
--- 5. Obtenir l'ensemble d'ancêtres de génération N d'un individu
--- 6. Afficher l'arbre à partir d'un noeud donné
--- 7. Obtenir les individus sans parents connus
--- 8. Obtenir les individus avec un seul parent connu
--- 9. Obtenir les individus avec deux parents
--- 10. Supprimer l'arbre
--- 11. Quitter
-
--- BIG TODO : handle case when user puts "1 2" when asked for prompt
-
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;           use Ada.Text_IO;
@@ -45,6 +25,7 @@ procedure Menu is
 
     OperationAbandonnedException : exception;
     AlreadyHasParentsException   : exception;
+    DeletingRootException        : exception;
 
     procedure HandleInput
        (Pointer          : in String_Access; TextString : in String;
@@ -408,6 +389,10 @@ procedure Menu is
                     InputType        => KEY, CheckKeyPresence => True,
                     KeyMustBePresent => True);
 
+                if UnboundedToInteger (TargetKey) = FamilyTree.getKey(ABR => Tree) then
+                    raise DeletingRootException;
+                end if;
+
                 deleteAncestor (Tree, UnboundedToInteger (TargetKey));
 
                 New_Line;
@@ -423,6 +408,12 @@ procedure Menu is
                        (GetColoredString
                            ("Abandon de l'operation. Aucun individu n'a été supprimé.",
                             WARNING));
+                when DeletingRootException =>
+                    New_Line;
+                    Put_Line
+                       (GetColoredString
+                           ("Vous ne pouvez pas supprimer l'individu 'racine' de l'arbre.",
+                            ERROR));
             end;
         end HandleDeleteAncestor;
 
@@ -615,8 +606,8 @@ procedure Menu is
             end if;
         end HandleGetDualParentIndividuals;
 
-        ExitTreeMenu    : Boolean := False;
-        Tree            : T_FamilyTree renames CurrentTree.Tree;
+        ExitTreeMenu : Boolean := False;
+        Tree         : T_FamilyTree renames CurrentTree.Tree;
     begin
         while not ExitTreeMenu loop
             New_Line;
@@ -713,8 +704,6 @@ procedure Menu is
                             SUCCESS));
                     TreeMenu;
                 elsif Operation = DELETE then
-                    --  TODO : delete memory from this tree ( stephane ? )
-
                     New_Line;
                     Put_Line
                        (GetColoredString
@@ -725,7 +714,12 @@ procedure Menu is
                                     1)
                                    .Name) &
                             "' a été supprimé.",
-                            SUCCESS));
+						   SUCCESS));
+					declare
+						TreeToDelete : T_FamilyTree := ExistingTrees.Element(Index => UnboundedToInteger (TreeOperationIndex) - 1).Tree;
+                    begin
+                        FamilyTree.clean (ABR => TreeToDelete);
+                    end;
                     Delete
                        (ExistingTrees,
                         UnboundedToInteger (TreeOperationIndex) - 1);
