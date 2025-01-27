@@ -687,7 +687,7 @@ procedure Menu is
                    (Pointer    => TreeOperationIndex'Access,
                     TextString =>
                        "Entrez votre choix " &
-                       GetMenuRangeString (GetExistingTreesLength) & ": ",
+                       GetMenuRangeString (GetExistingTreesLength - 1) & ": ",
                     InputType  => INT, MaxInt => GetExistingTreesLength - 1);
 
                 if Operation = CHOOSE then

@@ -6,7 +6,11 @@ package body utils is
 
    function GetMenuRangeString (Length : in Integer) return String is
    begin
-      return "(1-" & GetTrimmedInt (Length) & " ou 'q')";
+      if Length = 1 then
+        return "(1 ou 'q')";
+      else
+        return "(1-" & GetTrimmedInt (Length) & " ou 'q')";
+      end if;
    end GetMenuRangeString;
 
    function GetIndent (Depth : in Integer) return String is
