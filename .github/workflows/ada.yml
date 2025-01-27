@@ -33,7 +33,7 @@ jobs:
     - name: Run Tests
       run: |
         if [ -d "build/bin" ]; then
-          for file in build/bin/*; do
+          for file in build/bin/test*; do
             if [ -x "$file" ]; then
               echo -e "\033[34mRunning test: $file\033[0m"
               "$file"
