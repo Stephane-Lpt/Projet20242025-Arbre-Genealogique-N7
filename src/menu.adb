@@ -66,7 +66,10 @@ procedure Menu is
                 else
                     --  IN CASE WHEN ASKED FOR AN INTEGER, CHECKING IF IT'S A VALID INT
                     -- THIS WILL THROW AN ERROR IF IT IS NOT A VALID INT
-                    TempInt := (if (InputType = INT or InputType = KEY) then UnboundedToInteger (Input) else -1);
+                    TempInt :=
+                       (if (InputType = INT or InputType = KEY) then
+                           UnboundedToInteger (Input)
+                        else -1);
 
                     if InputType = INT then
                         -- CHECKING IF INT FALLS IN THE 1 .. MaxInt RANGE (only if MaxInt isn't the default value, -1)
@@ -93,7 +96,9 @@ procedure Menu is
                             end if;
                         end if;
                     elsif InputType = DATE then
-                        if Input /= To_Unbounded_String("") and not IsValidDateString (Input) then
+                        if Input /= To_Unbounded_String ("") and
+                           not IsValidDateString (Input)
+                        then
                             raise Data_Error;
                         end if;
                     end if;
@@ -181,32 +186,24 @@ procedure Menu is
             HandleInput
                (Pointer    => Gender'Access,
                 TextString => "Entrez le sexe de la personne: ");
-            HandleInput(Pointer=> Birthdate'Access, TextString => "Entrez la date d'anniversaire de la personne (format JJ-MM-AAAA): ", InputType => DATE);
+            HandleInput
+               (Pointer    => Birthdate'Access,
+                TextString =>
+                   "Entrez la date d'anniversaire de la personne (format JJ-MM-AAAA): ",
+                InputType  => DATE);
 
             NewPerson :=
                initPersonObj
                   (FirstName => FirstName, LastName => LastName,
                    Gender    => Gender, BirthDate => Birthdate);
 
-            if Position /= ROOT then
-                New_Line;
-                Put_Line
-                   (GetColoredString
-                       ("Un nouvel ancêtre a été ajoutée", SUCCESS));
-            end if;
-
         exception
             when OperationAbandonnedException =>
-                New_Line;
-                if Position /= ROOT then
+                if Position = ROOT then
+                    New_Line;
                     Put_Line
                        (GetColoredString
-                           ("Abandon de l'operation. L'ancêtre n'a pas été ajouté.",
-                            WARNING));
-                else
-                    Put_Line
-                       (GetColoredString
-                           ("Abandon de l'operation. L'arbre n'a pas été crée.",
+                           ("Abandon de l'operation. L'arbre n'a pas été crée. quoicoubeh",
                             WARNING));
                 end if;
 
@@ -345,7 +342,7 @@ procedure Menu is
                     raise AlreadyHasParentsException;
                 end if;
 
-                HandleCreateNewPerson;
+                HandleCreateNewPerson (Position => TargetPosition);
 
                 addAncestor
                    (ABR => Tree, TargetKey => UnboundedToInteger (TargetKey),
@@ -388,7 +385,9 @@ procedure Menu is
                     InputType        => KEY, CheckKeyPresence => True,
                     KeyMustBePresent => True);
 
-                if UnboundedToInteger (TargetKey) = FamilyTree.getKey(ABR => Tree) then
+                if UnboundedToInteger (TargetKey) =
+                   FamilyTree.getKey (ABR => Tree)
+                then
                     raise DeletingRootException;
                 end if;
 
@@ -407,7 +406,7 @@ procedure Menu is
                        (GetColoredString
                            ("Abandon de l'operation. Aucun individu n'a été supprimé.",
                             WARNING));
-                when DeletingRootException =>
+                when DeletingRootException        =>
                     New_Line;
                     Put_Line
                        (GetColoredString
@@ -713,9 +712,13 @@ procedure Menu is
                                     1)
                                    .Name) &
                             "' a été supprimé.",
-						   SUCCESS));
-					declare
-						TreeToDelete : T_FamilyTree := ExistingTrees.Element(Index => UnboundedToInteger (TreeOperationIndex) - 1).Tree;
+                            SUCCESS));
+                    declare
+                        TreeToDelete : T_FamilyTree :=
+                           ExistingTrees.Element
+                              (Index =>
+                                  UnboundedToInteger (TreeOperationIndex) - 1)
+                              .Tree;
                     begin
                         FamilyTree.clean (ABR => TreeToDelete);
                     end;
