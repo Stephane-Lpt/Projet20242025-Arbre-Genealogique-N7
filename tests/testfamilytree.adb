@@ -40,6 +40,10 @@ procedure TestFamilyTree is
       end createOrdinaryFamilyTree;
 
    begin
+      New_Line;
+      Put_Line("---- Tests DeleteAncestor... ----");
+      New_Line;
+      New_Line;
       -- ##########################################################
       Put_Line("Test 1: Suppression feuille (clé 5)");
       TestTree := createOrdinaryFamilyTree;
@@ -87,7 +91,7 @@ procedure TestFamilyTree is
       deleteAncestor(TestTree, 999);  -- Ne devrait rien modifier
       
       exception
-         when Tree.Absent_Key_Exception =>
+         when Absent_Key_Exception =>
             pragma Assert(not isEmpty(getNode (TestTree, 1)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
             pragma Assert(not isEmpty(getNode (TestTree, 2)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
             pragma Assert(not isEmpty(getNode (TestTree, 3)), "Test 4 échoué: Un autre noeud a été supprimé alors que rien ne devait être supprimé puisque la clé 99 n'existe pas.");
@@ -116,9 +120,9 @@ procedure TestFamilyTree is
          return FT;
       end Create_Complex_Tree;
    begin
-      Put_Line("");
+      New_Line;
       Put_Line("---- Tests GetGenerationsCount... ----");
-      Put_Line("");
+      New_Line;
       -- ##########################################################
       Put_Line("Test 1: Arbre vide");
       initFamilyTree (TestTree);
@@ -179,9 +183,9 @@ procedure TestFamilyTree is
    begin 
       Family := createOrdinaryFamilyTree;
 
-         Put_Line("");
+         New_Line;
          Put_Line("---- Tests GetAncestorsCount... ----");
-         Put_Line("");
+         New_Line;
 
 
       -- ##########################################################
@@ -231,9 +235,9 @@ procedure TestFamilyTree is
       Family : T_FamilyTree;
    begin
       Family := createOrdinaryFamilyTree;
-      Put_Line("");
+      New_Line;
       Put_Line("---- Tests GetAncestorsByGeneration... ----");
-      Put_Line("");
+      New_Line;
       -- ##########################################################
       -- Test 1: Génération 1 depuis la clé 1
       -- ##########################################################
@@ -300,6 +304,142 @@ procedure TestFamilyTree is
       
    end TestGetAncestorsByGeneration;
 
+   procedure TestGetOrphanIndividuals is
+      TestTree : T_FamilyTree;
+      Result   : TreeVector.Vector;
+      Expected : TreeVector.Vector;
+      EmptyTree : T_FamilyTree;
+
+      procedure Build_Test_Tree_1 is
+      begin
+         initChild(TestTree, 1, initPersonObj); -- [1] seul
+      end Build_Test_Tree_1;
+
+      procedure Build_Test_Tree_2 is
+      begin
+         initChild(TestTree, 1, initPersonObj);
+         addAncestor(TestTree, 1, LEFT, 2, initPersonObj); -- 1 -> 2 (père)
+      end Build_Test_Tree_2;
+
+      procedure Build_Test_Tree_3 is
+      begin
+         initChild(TestTree, 1, initPersonObj); -- 1 a 2 parents
+         addAncestor(TestTree, 1, LEFT, 2, initPersonObj); -- 2 a 0 parents
+         addAncestor(TestTree, 1, RIGHT, 3, initPersonObj); -- 3 a 0 parents
+      end Build_Test_Tree_3;
+
+      procedure Build_Complex_Test_Tree is
+      begin
+         initChild(TestTree, 1, initPersonObj);
+         -- Niveau 1
+         addAncestor(TestTree, 1, LEFT, 2, initPersonObj);   -- Père de 1
+         addAncestor(TestTree, 1, RIGHT, 3, initPersonObj);  -- Mère de 1
+         
+         -- Niveau 2
+         addAncestor(TestTree, 2, LEFT, 4, initPersonObj);   -- Père de 2
+         addAncestor(TestTree, 3, RIGHT, 5, initPersonObj);  -- Mère de 3
+         
+         -- Niveau 3
+         addAncestor(TestTree, 4, LEFT, 6, initPersonObj);   -- Père de 4, PAS DE PARENTS
+         addAncestor(TestTree, 5, RIGHT, 7, initPersonObj);  -- Mère de 5
+         
+         -- Niveau 4 avec mélange de cas
+         addAncestor(TestTree, 7, LEFT, 8, initPersonObj);   -- Père de 7, PAS DE PARENTS
+         addAncestor(TestTree, 7, RIGHT, 9, initPersonObj); -- Mère de 7
+         addAncestor(TestTree, 9, RIGHT, 10, initPersonObj); -- Père de 10, PAS DE PARENTS
+      end Build_Complex_Test_Tree;
+
+      function Key_In_Result(Key : Integer) return Boolean is
+      begin
+         for E of Result loop
+            if getKey(E) = Key then
+               return True;
+            end if;
+         end loop;
+         return False;
+      end Key_In_Result;
+
+   begin  
+      New_Line;
+      Put_Line("---- Tests GetOrphanIndividuals... ----");
+      New_Line;
+      -- ##########################################################
+      Put_Line("Test 1: Arbre vide");
+      initFamilyTree(EmptyTree);
+      Result := getOrphanIndividuals(EmptyTree, 1);
+      pragma Assert(Length(Result) = 0, "Test 1 échoué");
+      Put_Line("✓ Test 1 réussi");
+
+      -- ##########################################################
+      Put_Line("Test 2: Nœud unique sans parents");
+      Build_Test_Tree_1;
+      Result := getOrphanIndividuals(TestTree, 1);
+      pragma Assert(
+         Length(Result) = 1 and 
+         getKey(First_Element(Result)) = 1,
+         "Test 2 échoué"
+      );
+      Put_Line("✓ Test 2 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 3: Nœud avec 1 parent (gauche)");
+      Build_Test_Tree_2;
+      Result := getOrphanIndividuals(TestTree, 1);
+      pragma Assert(
+         Length(Result) = 1 and 
+         getKey(First_Element(Result)) = 2,
+         "Test 3 échoué"
+      );
+      Put_Line("✓ Test 3 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 4: Arbre complexe avec multiples cas");
+      Build_Test_Tree_3;
+      Result := getOrphanIndividuals(TestTree, 1);
+      
+      Expected.Append(getNode(TestTree, 2)); -- 2 a 0 parents
+      Expected.Append(getNode(TestTree, 3)); -- 3 a 0 parents
+      
+      pragma Assert(
+         Length(Result) = 2 and
+         Result = Expected,
+         "Test 4 échoué"
+      );
+      Put_Line("✓ Test 4 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 5: Clé inexistante");
+      Build_Test_Tree_2;
+      Result := getOrphanIndividuals(TestTree, 999);
+      pragma Assert(Length(Result) = 0, "Test 5 échoué");
+      Put_Line("✓ Test 5 réussi");
+      clean(TestTree);
+
+      -- ##########################################################
+      Put_Line("Test 6: Arbre complexe avec multiples cas");
+      Build_Complex_Test_Tree;
+      Result := getOrphanIndividuals(TestTree, 1);
+
+      -- Résultats attendus :
+      -- 6, PAS DE PARENTS
+      -- 8, PAS DE PARENTS
+      -- 10, PAS DE PARENTS
+      
+      pragma Assert(
+         Length(Result) = 3 and
+         Key_In_Result(6) and
+         Key_In_Result(8) and
+         Key_In_Result(10),
+         "Test 6 échoué - Résultat: " & Integer'Image(Length(Result))
+      );
+      
+      Put_Line("✓ Test 6 réussi");
+      clean(TestTree);
+   end TestGetOrphanIndividuals;
+
    procedure TestGetSingleParentIndividuals is
       TestTree : T_FamilyTree;
       Result   : TreeVector.Vector;
@@ -357,10 +497,10 @@ procedure TestFamilyTree is
       end Key_In_Result;
 
 
-   begin
-      Put_Line("");
-      Put_Line("---- Tests GetAncestorsByGeneration... ----");
-      Put_Line("");
+   begin  
+      New_Line;
+      Put_Line("---- Tests GetSingleParentIndividuals... ----");
+      New_Line;
       -- ##########################################################
       Put_Line("Test 1: Arbre vide");
       initFamilyTree(EmptyTree);
@@ -448,9 +588,6 @@ procedure TestFamilyTree is
       
       Put_Line("✓ Test 7 réussi");
       clean(TestTree);
-
-      
-
    end TestGetSingleParentIndividuals;
 
    procedure TestGetDualParentIndividuals is
@@ -489,6 +626,9 @@ procedure TestFamilyTree is
       end Contains_Key;
 
    begin
+      New_Line;
+      Put_Line("---- Tests GetDualParentIndividuals... ----");
+      New_Line;
       -- ##########################################################
       Put_Line("Test 1: Arbre vide");
       initFamilyTree(TestTree);
@@ -571,7 +711,6 @@ procedure TestFamilyTree is
       );
       Put_Line("✓ Test 7 réussi");
       clean(TestTree);
-
    end TestGetDualParentIndividuals;
 
 begin
@@ -579,6 +718,7 @@ begin
    TestGetGenerationsCount;
    TestGetAncestorsCount;
    TestGetAncestorsByGeneration;
+   TestGetOrphanIndividuals;
    TestGetSingleParentIndividuals;
    TestGetDualParentIndividuals;
 

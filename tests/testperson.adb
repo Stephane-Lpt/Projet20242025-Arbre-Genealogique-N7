@@ -2,7 +2,6 @@ with Utils; use Utils;
 with FamilyTree; use FamilyTree;
 with Person; use Person;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with FamilyTree; use FamilyTree;
 
 procedure TestPerson is
    FamilyTree : T_FamilyTree;
