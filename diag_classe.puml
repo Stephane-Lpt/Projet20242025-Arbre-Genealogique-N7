@@ -1,0 +1,74 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package Tree {
+  class "BinaryTree<T_Element>" as BinaryTree {
+    +type T_BinaryTree (private)
+    __Operations__
+    +initTree()
+    +initRoot()
+    +isEmpty() : Boolean
+    +isPresent() : Boolean
+    +getSize() : Integer
+    +getNode() : T_BinaryTree
+    +addNode()
+    +deleteNodeRecursive()
+    +clean()
+    +showTree()
+    +traverseTreeAndApply()
+  }
+
+  class FamilyTree {
+    +GetExampleFamilyTree()
+    +initFamilyTree()
+    +initChild()
+    +addAncestor()
+    +deleteAncestor()
+    +getGenerationsCount() : Integer
+    +getAncestorsCount() : Integer
+    +getAncestorsByGeneration() : TreeVector.Vector
+    +showFamilyTree()
+  }
+  
+  class T_Node {
+    +Key : Integer
+    +Element : T_Element
+    +Left : T_BinaryTree
+    +Right : T_BinaryTree
+  }
+  
+  BinaryTree *-right- T_Node
+}
+
+package Person {
+  class Person {
+    +GetPersonName() : String
+    +showPerson()
+    +initPersonObj() : T_Person
+  }
+  
+  class T_Person {
+    +FirstName
+    +LastName
+    +Gender
+    +Birthdate
+  }
+  
+  Person *-right- T_Person
+}
+
+package Utils {
+  class Utils {
+    +T_Position (ROOT, LEFT, RIGHT)
+    +GetIndent() : String
+    +GetBinaryTreePrefix() : String
+    +GetColoredString()
+  }
+}
+
+
+BinaryTree .right.> Utils : uses
+FamilyTree ..> Person : uses
+FamilyTree --|> BinaryTree
+@enduml
