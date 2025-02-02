@@ -2,7 +2,7 @@
 nikita*
 
 # consignes, corrigés
-*.pdf
+# *.pdf
 
 *.exe
 *.bexch
